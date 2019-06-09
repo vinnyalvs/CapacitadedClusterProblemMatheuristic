@@ -18,19 +18,15 @@ int main()
    string outputPath = "../CPP/output.txt";
    Input input;
    //DCC136-82_02.txt"
-    input.readInstance("RanReal480_01.txt", 1);
+    input.readInstance("RanReal480/RanReal480_01.txt", 1);
     clock_t endT,initialT = clock(),elapsedT;
    Heuristic h(&input);
     endT = clock();
     elapsedT = ((endT - initialT) / (CLOCKS_PER_SEC)); // Converte tempo gasto em segundos
-    double tRemaining = 60 - (double) elapsedT;
-    h.greedyRandomizedReactive(10, 1, tRemaining, 13);
-    h.solution->printSolution();
+   // double tRemaining = 60 - (double) elapsedT;
+    h.greedyRandomizedReactive(10, 1, 100000, 13);
+   // h.solution->printSolution();
     cout << "cost: " << h.solution->calculateCost() << " "<< h.solution->isFeasible(input.lowerB, input.upperB) << endl;
-    h.solution->printSolution();
-    cout << "cost: " << h.solution->calculateCost() << " "<< h.solution->isFeasible(input.lowerB, input.upperB) << endl;
-   cout <<  h.solution->calculateCost() << endl;
-
    // run(instanceList,outputPath);
    // verifySolution("../DefinicaoClusters/verify.txt","../DefinicaoClusters/instancias/TipoA/DCC136-82_03.txt",1);
     return 0;

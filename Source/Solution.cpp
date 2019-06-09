@@ -74,13 +74,12 @@ bool Solution::isFeasible(double lowerB,double upperB){
 
     vector<int> list;
     int count =0;
-	system("cls");
+
+
     for (auto i : groupList)
     {
         for(auto j : i.nodeList ){
             list.push_back(j);
-			if(j == 265)
-				cout << j << endl;
             if( j<0 || j>Group::g->order)
                 return false;
         }
@@ -101,8 +100,7 @@ bool Solution::isFeasible(double lowerB,double upperB){
 
 		}
 		else
-			cout << i << " " << list[abs(list[i])] << endl;
-            //return false;
+            return false;
         i++;
     }
 

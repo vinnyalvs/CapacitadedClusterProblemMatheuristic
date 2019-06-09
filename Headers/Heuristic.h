@@ -18,8 +18,9 @@ class Heuristic {
 public:
     Heuristic(Input* input);
     void constructive(double alpha, unsigned long seed, double tRemaining);
-    void greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed);
-
+    //void greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed);
+	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
+	void localSearch(int param);
     clock_t tInicioLeitura, tFimLeitura;
 
     Solution* solution;

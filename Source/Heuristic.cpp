@@ -34,7 +34,7 @@ void Heuristic::greedyRandomized(double alpha)
 		G.id = i;
 		groupList.push_back(G);
 		unsigned int nodeId = rand() % nodes.size();
-		nodeId = g->nodes[nodeId].id;
+		nodeId = nodes[nodeId].id;
 		groupList[i].insertNode(nodeId);
 		int j;
 		for (j = 0; j < nodes.size(); j++) {
@@ -46,7 +46,6 @@ void Heuristic::greedyRandomized(double alpha)
 		else
 			nodes.erase(nodes.begin() + j);
 	}
-	cout << "-------" << endl;
 	//Fase 2
 	bool control = false;
 	int count = 0;
@@ -83,6 +82,7 @@ void Heuristic::greedyRandomized(double alpha)
 		groupList = groupCandidates;
 	}
 	//Fase 3
+	if(nodes.size() != 0)
 	 control = false;
 	while (!control) {
 		int bestGroup = -1;
@@ -113,20 +113,16 @@ void Heuristic::greedyRandomized(double alpha)
 		}
 		groupList = groupCandidates;
 	}
-	system("cls");
 	solution->groupList = groupList;
-	cout << solution->isFeasible(input->lowerB, input->upperB);
-	cout << solution->calculateCost() << endl;;
+	//cout << "Cost: " << solution->calculateCost() << endl;;
 }
 
 double Heuristic::calculateGain(Group *group,unsigned int nodeId) {
 	double gain = 0.0;
 	for (auto n : group->nodeList) {
 		gain += g->edges[n][nodeId];
-		if (gain < 0)
-			cout << "g " << gain << " " << n << nodeId << endl;
 	}
-	return gain;
+	return gain/group->weight;
 }
 
 bool Heuristic::checkLowerBound(vector <Group> *groupList) {
@@ -137,11 +133,6 @@ bool Heuristic::checkLowerBound(vector <Group> *groupList) {
 	}
 	return true;
 }
-
-
-
-
-
 
 
 void Heuristic::phase2(vector<Group> groupList, vector<Node> *nodes, double alpha)
@@ -184,66 +175,7 @@ void Heuristic::phase2(vector<Group> groupList, vector<Node> *nodes, double alph
 
 int Heuristic::swapFix()
 {
-  /*  set<unsigned int> avaliableNodeList;
-    set<unsigned int> possibleGroups;
-
-    set<unsigned int>::iterator selectedGroup;
-
-    unsigned long position;
-    vector<unsigned int> nodeList;
-
-    bool preFixAvaliableNodes[g->order];
-    for (int i = 0; i < g->order; ++i)
-        preFixAvaliableNodes[i] = solution->avaliableNodes[i];
-
-    for (unsigned int i = 0; i < g->order; ++i)
-        if (solution->avaliableNodes[i])
-            avaliableNodeList.insert(i);
-
-    if (avaliableNodeList.empty())
-        return 1;
-
-    for (auto i : avaliableNodeList)
-    {
-        //adiciona a lista de possiveis grupos se o no da aresta j esta em uma solucao e se adicionar
-        //o no i nao causa inviabilidade pelo upperB
-        for (auto j : g->nodes[i].edges)
-            if (!solution->avaliableNodes[j.first] && solution->nodeGroupRelation[j.first] != UINT32_MAX)
-                if(solution->groupList[solution->nodeGroupRelation[j.first]].weight + g->nodes[i].weight <= input->upperB)
-                    possibleGroups.insert(solution->nodeGroupRelation[j.first]);
-
-        if (possibleGroups.empty())
-            continue;
-
-        position = random() % possibleGroups.size();
-
-        selectedGroup = possibleGroups.begin();
-        for (int k = 0; k < position; ++k)
-            ++selectedGroup;
-
-        nodeList.clear();
-        nodeList = solution->groupList[*selectedGroup].nodeList;
-
-        while (!nodeList.empty())
-        {
-            position = random() % nodeList.size();
-            if (solution->groupList[*selectedGroup].weight - g->nodes[position].weight +
-                        g->nodes[i].weight <= input->upperB)
-            {
-                solution->swapNodes(*selectedGroup, position, i);
-                break;
-            }
-            else
-                nodeList.erase(nodeList.begin() + position);
-        }
-    }
-
-    int i = 0;
-    for (i = 0; i < g->order && preFixAvaliableNodes[i] == solution->avaliableNodes[i]; ++i);
-    if (i == g->order)
-        return fixSolution();
-
-    phase2(); */
+  
     return 0;
 }
 
@@ -294,10 +226,12 @@ int Heuristic::fixSolution()
 	return 1;
 }
 
-void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed) {
+void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed) {
 
     clock_t tBegin, tActual;
-    double time=0;
+    int iterationCount=0;
+	int deletedCount = 0;
+	double time;
     tBegin = clock();
     random.seed(seed);
     double **alphas = new double *[alphaRR]; //Alocando o vetor dos alphas
@@ -314,9 +248,14 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, double tRemain
         solution = nullptr;
         while (solution == nullptr)
             greedyRandomized(alphas[i][0]);              //inicializando o somatorio para nao zerar a probabilidade de escolha
-        alphas[i][2] = solution->calculateCost();        //soma do valor das execucoes
-        //delete solution;
-        alphas[i][3] = 0;                         //quantidade de execucoes
+		if (solution->isFeasible(input->lowerB, input->upperB)) {
+			alphas[i][2] = solution->calculateCost();  //soma do valor das execucoes
+			alphas[i][3] = 0;                         //quantidade de execucoes
+		}
+		else
+			deletedCount++;
+			      
+
     }
 
     int ind = 0;              //variaveis auxiliares a escolha do alpha
@@ -324,7 +263,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, double tRemain
     default_random_engine re;
 
     //loop de execucao
-    while (time < tRemaining)
+    while (iterationCount < numIterations)
     {
         /*
         for(int i = 0; i < alphaRR; ++i)
@@ -334,10 +273,16 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, double tRemain
 
         ind = selectAlpha(alphas, alphaRR, randomFloat(re));
 
-        solution = nullptr;
-        while (solution == nullptr)
-            greedyRandomized(alphas[ind][0]);
-
+        //solution = nullptr;
+        //while (solution == nullptr)
+         greedyRandomized(alphas[ind][0]);
+		 if (!solution->isFeasible(input->lowerB, input->upperB)) {
+			 delete solution;
+			 deletedCount++;
+			 break;
+		}
+		 iterationCount++;
+			
         cost = solution->calculateCost();
 
        // localSearch2(1);
@@ -355,7 +300,8 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, double tRemain
 
         tActual = (clock() - tBegin) / (CLOCKS_PER_SEC);
         time = (double) tActual;
-        cout << time << endl;
+		cout << "Deletadas" <<  deletedCount << endl;
+        cout << "tempo: " << time << "s" << endl;
     }
 
     for (int i = 0; i < alphaRR; ++i)
@@ -363,6 +309,11 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, double tRemain
     delete[] alphas;
 
     solution = bestS;
+}
+
+void Heuristic::localSearch(int param)
+{
+
 }
 
 
