@@ -20,7 +20,7 @@ public:
     void constructive(double alpha, unsigned long seed, double tRemaining);
     //void greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed);
 	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
-	void localSearch(int param);
+	void localSearch(double alpha);
     clock_t tInicioLeitura, tFimLeitura;
 
     Solution* solution;

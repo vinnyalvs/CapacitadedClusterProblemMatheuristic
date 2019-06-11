@@ -82,20 +82,36 @@ void Heuristic::greedyRandomized(double alpha)
 		groupList = groupCandidates;
 	}
 	//Fase 3
+	vector <Group> auxCandidates;
+	int auxWeightControl = 0;
+	int bestGroup = -1;
+	unsigned int groupId;
 	if(nodes.size() != 0)
 	 control = false;
 	while (!control) {
-		int bestGroup = -1;
 		double bestGain = 0.0;
 		unsigned int nodeId = rand() % nodes.size();
 		nodeId = nodes[nodeId].id;
 		vector <Group> groupCandidates = groupList;
-		std::sort(groupCandidates.begin(), groupCandidates.end(), [](Group lhs, Group rhs)
-		{
-			return lhs.weight < rhs.weight;
-		});
-		unsigned int groupId = rand() % (int)(groupCandidates.size() * alpha);
+
+		if (auxWeightControl < 3) {
+			std::sort(groupCandidates.begin(), groupCandidates.end(), [](Group lhs, Group rhs)
+			{
+				return lhs.cost > rhs.cost;
+			});
+		}
+		else {
+			std::sort(groupCandidates.begin(), groupCandidates.end(), [](Group lhs, Group rhs)
+			{
+				return lhs.cost > rhs.cost;
+			});
+			auxCandidates.push_back(groupCandidates[groupId]);
+			auxWeightControl = 0;
+			groupCandidates.erase(groupCandidates.begin() + groupId);
+		}
+		groupId = rand() % (int)ceil((groupCandidates.size() * alpha));
 		double gain = calculateGain(&groupCandidates[groupId], nodeId);
+		bestGroup = -1;
 		if (bestGain < gain && ((groupCandidates[groupId].weight + g->nodes[nodeId].weight) <  input->upperB)) {
 			bestGroup = groupId; //groupCandidates[groupId].id;
 			bestGain = gain;
@@ -108,13 +124,21 @@ void Heuristic::greedyRandomized(double alpha)
 					break;
 			nodes.erase(nodes.begin() + i);
 		}
+		else
+			auxWeightControl++;
 		if (nodes.size() == 0) {
 			control = true;
 		}
+	//	solution->groupList = groupCandidates;
 		groupList = groupCandidates;
+	//	cout << "Cost: " << solution->calculateCost() << endl;;
 	}
+	for (int i = 0; i < auxCandidates.size(); i++)
+		groupList.push_back(auxCandidates[i]);
 	solution->groupList = groupList;
-	//cout << "Cost: " << solution->calculateCost() << endl;;
+//	cout << "Cost: " << solution->calculateCost() << endl;
+//	cout << "Cost: " << solution->isFeasible(input->lowerB,input->upperB) << endl;;
+
 }
 
 double Heuristic::calculateGain(Group *group,unsigned int nodeId) {
@@ -311,10 +335,15 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
     solution = bestS;
 }
 
-void Heuristic::localSearch(int param)
+void Heuristic::localSearch(double alpha)
 {
+	vector <Group> groupList = solution->groupList;
+	unsigned int groupId = rand() % groupList.size();
+	groupId = groupList[groupId].id;
+
 
 }
+
 
 
 void Heuristic::updateAlphaProbability(double **alphas, int alphaRR, double bestCost)
