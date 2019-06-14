@@ -9,13 +9,16 @@
 #include "Input.h"
 #include <random>
 #include <algorithm>
+#include <utility>
 #include <set>
 #include <map>
 #include <time.h>
 #include <cfloat>
 
+using namespace std;
 class Heuristic {
 public:
+
     Heuristic(Input* input);
     void constructive(double alpha, unsigned long seed, double tRemaining);
     //void greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed);
@@ -24,6 +27,7 @@ public:
     clock_t tInicioLeitura, tFimLeitura;
 
     Solution* solution;
+    vector <Solution*> solutions;
     mt19937_64 random;
     Input *input;
     Graph* g;

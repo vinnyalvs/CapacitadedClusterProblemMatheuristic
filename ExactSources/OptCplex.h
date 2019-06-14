@@ -1,5 +1,6 @@
 #pragma once
 #include "Opt.h"
+#include <ilcplex/cplex.h>
 #include <ilcplex/ilocplex.h>
 #include <vector>
 using namespace std;
@@ -26,11 +27,7 @@ public:
 	~CplexModel();
 	IloModel	getModel();
 	void		imprimirInformacoes();
-<<<<<<< HEAD
-	void		addVar(double upperbound, double obj, string name, string type = "float", double lowerbound = 0);
-=======
 	void		addVar(double upperbound, double obj, string name, string type = "float", double lowerbound=0);
->>>>>>> c890a40ff3f7eb48f2fc8803b22a39c2ce951ecd
 	float around(float var);
 	void		changeNonzeros(int nonzeros, string name);
 	void		removeVar(string name);

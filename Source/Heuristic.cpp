@@ -55,15 +55,26 @@ void Heuristic::greedyRandomized(double alpha)
 		unsigned int nodeId = rand() % nodes.size();
 		nodeId = nodes.at(nodeId).id;
 		vector <Group> groupCandidates = groupList;
-		std::sort(groupCandidates.begin(), groupCandidates.end(), [](Group lhs, Group rhs)
+		vector <pair <double, unsigned int>> gains;
+				unsigned int groupId = rand() % (int)(groupCandidates.size() * alpha);
+		for(auto c: groupCandidates){
+			groupId = c.id;
+			gains.push_back(make_pair(calculateGain(&groupCandidates[c.id], nodeId),groupCandidates[c.id].id));
+
+		}
+		
+		std::sort(gains.begin(), gains.end(), [](pair <double, unsigned int> lhs, pair <double, unsigned int> rhs)
+		{
+			return lhs.first > rhs.first;
+		});
+	//	cout << gains[0].first << endl;
+	/* 	std::sort(groupCandidates.begin(), groupCandidates.end(), [](Group lhs, Group rhs)
 		{
 			return lhs.weight < rhs.weight;
 		});
-		unsigned int groupId = rand() % (int)(groupCandidates.size() * alpha);
-		double gain = calculateGain(&groupCandidates[groupId], nodeId);
-		if (bestGain < gain && ((groupCandidates[groupId].weight + g->nodes[nodeId].weight) <  input->upperB)) {
-			bestGroup = groupId; //groupCandidates[groupId].id;
-			bestGain = gain;
+		double gain = calculateGain(&groupCandidates[groupId], nodeId); */
+		if ((groupCandidates[gains[0].second].weight + g->nodes[gains[0].second].weight) <  input->upperB) {
+			bestGroup = gains[0].second; //groupCandidates[groupId].id;
 		}
 		if (bestGroup != -1) {
 			groupCandidates[bestGroup].insertNode(nodeId);
@@ -93,6 +104,7 @@ void Heuristic::greedyRandomized(double alpha)
 		unsigned int nodeId = rand() % nodes.size();
 		nodeId = nodes[nodeId].id;
 		vector <Group> groupCandidates = groupList;
+//ordenar pelo ganho
 
 		if (auxWeightControl < 3) {
 			std::sort(groupCandidates.begin(), groupCandidates.end(), [](Group lhs, Group rhs)
@@ -199,54 +211,16 @@ void Heuristic::phase2(vector<Group> groupList, vector<Node> *nodes, double alph
 
 int Heuristic::swapFix()
 {
-  
+
+	//1-opt
+		//Sortear (todos os nos) no e colocar no melhor possivel enquanto ha melhora (ou duas vezes)
+		//pre calcular(x e y)
+	//Tirar pior cada cluster e colocar no melhor
     return 0;
 }
 
 int Heuristic::fixSolution()
 {
-	/*
-    vector<Edge> groupList;
-    for (int i = 0; i < input->K; ++i)
-        groupList.emplace_back(i, solution->groupList[i].weight);
-    sort(groupList.begin(), groupList.end(), Node::edgeSorter);
-
-    vector<unsigned int> nodeList;
-    for (unsigned int i = 0 ; i < g->order; ++i)
-        if (solution->avaliableNodes[i])
-            nodeList.push_back(i);
-
-    vector<unsigned int>::iterator it;
-
-    while (!nodeList.empty())
-    {
-        it = nodeList.begin() + random() % nodeList.size();
-        auto iter = groupList.begin();
-        for (; iter != groupList.end(); ++iter)
-        {
-            if (g->nodes[*it].weight + solution->groupList[iter->first].weight  <= input->upperB)
-            {
-                solution->insertNode(iter->first, (*it));
-
-                for (auto j : g->nodes[*it].edges)
-                {
-                    if (solution->avaliableNodes[j.first])
-                        if (g->nodes[j.first].weight + solution->groupList[iter->first].weight <= input->upperB)
-                            solution->insertNode(iter->first, j.first);
-                }
-
-                break;
-            }
-        }
-        if (iter == groupList.end())
-            return -1;
-
-        nodeList.clear();
-        for (unsigned int i = 0 ; i < g->order; ++i)
-            if (solution->avaliableNodes[i])
-                nodeList.push_back(i);
-    }
-    return 1; */
 	return 1;
 }
 
@@ -275,6 +249,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 		if (solution->isFeasible(input->lowerB, input->upperB)) {
 			alphas[i][2] = solution->calculateCost();  //soma do valor das execucoes
 			alphas[i][3] = 0;                         //quantidade de execucoes
+			solutions.push_back(solution);
 		}
 		else
 			deletedCount++;
@@ -297,8 +272,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
         ind = selectAlpha(alphas, alphaRR, randomFloat(re));
 
-        //solution = nullptr;
-        //while (solution == nullptr)
+
          greedyRandomized(alphas[ind][0]);
 		 if (!solution->isFeasible(input->lowerB, input->upperB)) {
 			 delete solution;
@@ -306,6 +280,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 			 break;
 		}
 		 iterationCount++;
+		 solutions.push_back(solution);
 			
         cost = solution->calculateCost();
 

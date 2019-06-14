@@ -1,4 +1,4 @@
-#include "../Headers/OptCplex.h"
+#include "OptCplex.h"
 
 /**
 CS-11 Asn 2
@@ -91,13 +91,9 @@ void CplexModel::addConstraint(double rightSide, string type, string name, doubl
 
 void CplexModel::addConstraint(double coeff, int rhsVarId, int lhsVarId, string type, string name, double lowerbound) {
 	try {
-<<<<<<< HEAD
 		int coeffRounded = coeff * 1000;
 		coeff = (double)coeffRounded / 1000;
 		model.add(coeff * vars[lhsVarId] - vars[rhsVarId] <= 0);
-=======
-		model.add(coeff * vars[lhsVarId] - vars[rhsVarId] <= 0 );
->>>>>>> c890a40ff3f7eb48f2fc8803b22a39c2ce951ecd
 		numConstraints++;
 	}
 	catch (IloException& ex) {
@@ -252,11 +248,7 @@ void CplexModel::buildModel(string sense)
 	model.add(constr);
 	model.add(objective);
 
-<<<<<<< HEAD
 	if (sense == "maximize")
-=======
-	if(sense == "maximize")
->>>>>>> c890a40ff3f7eb48f2fc8803b22a39c2ce951ecd
 		objective.setSense(IloObjective::Maximize);
 	else
 		objective.setSense(IloObjective::Minimize);
@@ -297,27 +289,16 @@ void CplexModel::buildModel(string sense, int varMaxDisp, int varMaxDist)
 
 	IloObjective *obj;
 	//obj.setExpr(vars[varMaxDisp] + vars[varMaxDist]);
-<<<<<<< HEAD
 	//	obj = new IloObjective(env, vars[varMaxDisp] * vars[varMaxDist], IloObjective::Minimize);
 	//obj.setSense(IloObjective::Minimize);
 
 
-=======
-//	obj = new IloObjective(env, vars[varMaxDisp] * vars[varMaxDist], IloObjective::Minimize);
-	//obj.setSense(IloObjective::Minimize);
-	
-	
->>>>>>> c890a40ff3f7eb48f2fc8803b22a39c2ce951ecd
 	obj = new IloObjective(env, vars[varMaxDisp], IloObjective::Minimize);
 
 	model.add(vars);
 	model.add(constr);
 	//cplex.setParam(IloCplex::Param::SolutionType, 2);
-<<<<<<< HEAD
 	//	model.add(objective);
-=======
-//	model.add(objective);
->>>>>>> c890a40ff3f7eb48f2fc8803b22a39c2ce951ecd
 	model.add(*obj);
 
 

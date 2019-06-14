@@ -12,19 +12,21 @@ using namespace std;
 void run(const string &instanceList, string outputPath);
 void verifySolution(string path,string originalPath,int type);
 
-int main()
+int main(int arc, char **argv)
 {
    string instanceList = "../CCP/Instancias/instanceList.txt";
    string outputPath = "../CPP/output.txt";
    Input input;
    //DCC136-82_02.txt"
-    input.readInstance("RanReal480/RanReal480_01.txt", 1);
+   
+    input.readInstance(argv[1], 1);
+
     clock_t endT,initialT = clock(),elapsedT;
    Heuristic h(&input);
     endT = clock();
     elapsedT = ((endT - initialT) / (CLOCKS_PER_SEC)); // Converte tempo gasto em segundos
    // double tRemaining = 60 - (double) elapsedT;
-    h.greedyRandomizedReactive(10, 1, 1000, 13);
+    h.greedyRandomizedReactive(10, 1, 1, 13);
    // h.solution->printSolution();
     cout << "cost: " << h.solution->calculateCost() << " "<< h.solution->isFeasible(input.lowerB, input.upperB) << endl;
    // run(instanceList,outputPath);
@@ -56,7 +58,6 @@ void run(const string &instanceList, string outputPath) {
     int count=0;
     int type=1;
     while (instanceReader >> path) {
-        //Linux
         count++;
         if (count > 15) // Gambiarra para ler as 15 instancias do tipo1 e depois ler as do tipo 2
             type = 2;

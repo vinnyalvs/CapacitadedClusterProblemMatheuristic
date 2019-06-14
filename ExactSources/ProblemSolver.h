@@ -1,40 +1,39 @@
 #pragma once
 
-#include "Opt.h";
+#include "Opt.h"
 #include "Environment.h"
-#include "ShortSolution.h"
-#include "MasterProblem.h"
+#include "../headers/Solution.h"
+#include "../headers/Input.h"
 class ProblemSolver
 {
-
 private:
 	int solver;
 	Environment *env;
-	MasterProblem mProblem;
-	vector <ShortSolution*> solutions;
-	ShortSolution *bestSolution;
+	vector <Solution*> solutions;
+	Solution *bestSolution;
 	int bestSolutionId;
 	Param p;
-
-	vector <vector <int>> clusters;
+	int numObjs;
+	int numClusters;
+	vector <Group> clusters;
 
 public:
-	ProblemSolver(int solver);
+	ProblemSolver(int solver, int numObjs, int numClusters);
 	void setEnvironment(Environment *env);
 	Environment *getEnvironment();
 	void setSolver(int solver);
-	void addSolution(ShortSolution *solution);
+	void addSolution(Solution *solution);
 	//void findBestSolution();
-	ShortSolution *getBestSolution();
+	Solution *getBestSolution();
 	int getBestSolutionId();
 	void setParams(Param p);
 	void solveProblem();
+	void buildProblem();
 
 
 
 
-
-	vector <vector <int>> getClusters();
+	vector <Group> getClusters();
 	vector<int> objByCluster;
 
 	~ProblemSolver();
