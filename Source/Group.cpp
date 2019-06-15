@@ -25,6 +25,38 @@ void Group::insertNode(unsigned int index)
     this->nodeList.push_back(index);
 }
 
+void Group::insertNode(unsigned int index,int p)
+{
+    this->nodeList.push_back(index);
+}
+
+void Group::removeNode(unsigned int index)
+{
+    int count=0,aux;
+    weight -= g->nodes[index].weight;
+    for (auto i : nodeList){
+        cost -= g->edges[index][i];
+        if(i == index)
+            aux = count;
+        count++;
+    }
+    this->nodeList.erase(nodeList.begin() + aux);
+}
+
+void Group::removeNode(unsigned int index, int p)
+{
+    int count=0,aux;
+    //weight -= g->nodes[index].weight;
+    for (auto i : nodeList){
+      //  cost -= g->edges[index][i];
+        if(i == index)
+            aux = count;
+        count++;
+    }
+    this->nodeList.erase(nodeList.begin() + aux);
+}
+
+
 void Group::printGroup()
 {
     cout << "{";

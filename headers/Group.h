@@ -15,7 +15,12 @@ public:
     Group(unsigned int id);
     ~Group(){};
     void insertNode(unsigned int id);
+    void removeNode(unsigned int id);
+    void insertNode(unsigned int id,int p);
+    void removeNode(unsigned int id,int p);
+
     void printGroup();
+
 
     vector<unsigned int> nodeList;
     double weight;

@@ -14,12 +14,12 @@ public:
     Solution();
     ~Solution();
     vector<Group> groupList;
-    unsigned int* nodeGroupRelation;
     void printSolution();
     void insertNode(unsigned int groupId, unsigned int id);
     void insertNodeBack(unsigned int id);
-    void swapNodes(unsigned int groupId, unsigned long removedPosition, unsigned int insertedId);
+    int getGroup(unsigned int nodeId);
 
+    double cost;
     double calculateCost();
     bool isFeasible(double lowerB,double upperB);
 
