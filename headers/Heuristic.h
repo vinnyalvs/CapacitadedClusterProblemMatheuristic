@@ -25,6 +25,8 @@ public:
 	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
 	void localSearch(double alpha);
 	void localSearch2();
+	void localSearch3(double alpha);
+	void trade();
 	unsigned int getWorstNode(Group *group);
     clock_t tInicioLeitura, tFimLeitura;
 
