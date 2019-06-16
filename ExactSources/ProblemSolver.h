@@ -19,6 +19,7 @@ private:
 
 public:
 	ProblemSolver(int solver, int numObjs, int numClusters);
+	~ProblemSolver();
 	void setEnvironment(Environment *env);
 	Environment *getEnvironment();
 	void setSolver(int solver);
@@ -36,6 +37,5 @@ public:
 	vector <Group> getClusters();
 	vector<int> objByCluster;
 
-	~ProblemSolver();
 };
 

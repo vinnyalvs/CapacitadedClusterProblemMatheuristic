@@ -1,7 +1,7 @@
 #include "ProblemSolver.h"
 
 enum {
-	EXATO, 
+	EXATO,
 	FRAC
 };
 
@@ -16,9 +16,15 @@ ProblemSolver::ProblemSolver(int solver, int numObjs, int numClusters)
 	p.fixedNumClusters = true; //Por enquanto
 	cout << "Iniciando Solver" << endl;
 
-	
+
 }
 
+ProblemSolver::~ProblemSolver(){
+    delete env;
+    for(int i=0;i<solutions.size();i++){
+        delete solutions[i];
+    }
+}
 
 
 
@@ -37,7 +43,7 @@ void ProblemSolver::setSolver(int solver)
 	this->solver = solver;
 }
 
-void ProblemSolver::addSolution(Solution * solution)
+void ProblemSolver::addSolution(Solution *solution)
 {
 	solutions.push_back(solution);
 }
@@ -62,11 +68,11 @@ void ProblemSolver::solveProblem()
 {
 	// build Master Problem
 	//mProblem.setEnvironment(env);
-
+    cout << "Chamando Resolvedor" << endl;
 	buildProblem();
 
 /*	objByCluster.assign(numObjs, 0);
-	
+
 	clusters = mProblem.getClusters();
 
 	for (int i = 0; i < clusters.size(); i++) {
@@ -75,14 +81,13 @@ void ProblemSolver::solveProblem()
 		}
 	}  */
 
-	cout << "a" << endl;
+
 }
 void ProblemSolver::buildProblem(){
-	Environment *newEnv = new Environment(1);
-	Model *newModel = newEnv->getMdlCplex();
+	Model *newModel = env->getMdlCplex();
 	int indCnstNumClusters;
 	int numClusterBound = 2; // Numero de clusters é fixo
-	
+
 	const int numAllClusters = solutions.size() * numClusters;
 
 	vector <int> exprs;
@@ -98,11 +103,15 @@ void ProblemSolver::buildProblem(){
 	for (int j = 0; j < numObjs; j++) {
 		newModel->addConstraint(1, "=", "ConstrObject" + std::to_string(j), 1);
 	}
-	system("cls");
+    //system("clear");
 	int countCluster = 0;
+	cout << "------------" << endl;
+	cout << "Sol:" << solutions.size() << endl;
+
 	for (int i = 0; i < solutions.size(); i++) {
 		//cout << i << endl;
 		vector <double> costs;
+        cout << i << " " << solutions[i]->groupList.size() << " " << solutions[i]->cost <<  endl;
 		vector <Group> clusters = solutions[i]->groupList;
 		for(auto c: clusters){
 			costs.push_back(c.cost);
@@ -128,7 +137,7 @@ void ProblemSolver::buildProblem(){
 		vector <Group> groups = solutions[c]->groupList;
 		clusters.push_back(groups[clusterSol]);
 
-	} 
+	}
 
 }
 
@@ -137,8 +146,5 @@ vector<Group> ProblemSolver::getClusters()
 	 return clusters ;
 }
 
-ProblemSolver::~ProblemSolver()
-{
-	delete env;
-}
+
 

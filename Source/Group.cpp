@@ -35,7 +35,8 @@ void Group::removeNode(unsigned int index)
     int count=0,aux;
     weight -= g->nodes[index].weight;
     for (auto i : nodeList){
-        cost -= g->edges[index][i];
+        if(i != index)
+            cost -= g->edges[index][i];
         if(i == index)
             aux = count;
         count++;

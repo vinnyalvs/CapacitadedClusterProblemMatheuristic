@@ -9,6 +9,7 @@ Heuristic::Heuristic(Input *input)
 	solution = new Solution;
 	this->input = input;
 	this->g = input->g;
+	pSolver = new ProblemSolver(1,input->g->order,input->K);
 }
 
 void Heuristic::constructive(double alpha, unsigned long seed, double tRemaining)
@@ -376,6 +377,69 @@ int Heuristic::fixSolution()
 	return 1;
 }
 
+void Heuristic::runSolver(){
+/*Environment env = new Environment(solver);
+Param p;
+p.fixedNumClusters = true;
+Model *newModel = env->getMdlCplex();
+	int indCnstNumClusters;
+	int numClusterBound = 2; // Numero de clusters é fixo
+
+	const int numAllClusters = solutions.size() * numClusters;
+
+	vector <int> exprs;
+	exprs.assign(numObjs, 0);
+
+	vector <double> costClusters;
+	string op = (numClusterBound == 1 ? "<=" : (numClusterBound == 2 ? "=" : ">="));
+
+	if (p.fixedNumClusters) {
+		newModel->addConstraint(numClusters, op, "numClusters", numClusters);
+		indCnstNumClusters = newModel->getNumConstraints() - 1;
+	}
+	for (int j = 0; j < numObjs; j++) {
+		newModel->addConstraint(1, "=", "ConstrObject" + std::to_string(j), 1);
+	}
+    //system("clear");
+	int countCluster = 0;
+	cout << "------------" << endl;
+	cout << "Sol:" << solutions.size() << endl;
+
+	for (int i = 0; i < solutions.size(); i++) {
+		//cout << i << endl;
+		vector <double> costs;
+        cout << i << " " << solutions[i]->groupList.size() << " " << solutions[i]->cost <<  endl;
+		vector <Group> clusters = solutions[i]->groupList;
+		for(auto c: clusters){
+			costs.push_back(c.cost);
+		}
+		for (int j = 0; j < numClusters; j++) {
+			newModel->addVar(1, costs[j], "cluster" + std::to_string(newModel->getNumVars()), "int", 0);
+			int indVar = newModel->getNumVars() - 1;
+			for (int k = 0; k < clusters[j].nodeList.size(); k++) {
+				unsigned int indCnstr = clusters[j].nodeList[k];
+				newModel->setConstraintCoeffs(1, indCnstr, indVar);
+			}
+			if (p.fixedNumClusters)
+				newModel->setConstraintCoeffs(1, indCnstNumClusters, indVar);
+			}
+}
+
+	newModel->buildModel("maximize");
+	vector <int> x = newModel->getVarsInSol();
+	int solution, clusterSol;
+	for(int c=0;c<x.size();c++){
+		solution = floor(x[c]/numClusters);
+		clusterSol = x[c] - ((solution)*numClusters);
+		vector <Group> groups = solutions[c]->groupList;
+		clusters.push_back(groups[clusterSol]);
+
+	} */ ///
+	pSolver->solveProblem();
+
+
+}
+
 void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed) {
 
 	clock_t tBegin, tActual;
@@ -401,7 +465,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 		if (solution->isFeasible(input->lowerB, input->upperB)) {
 			alphas[i][2] = solution->calculateCost();  //soma do valor das execucoes
 			alphas[i][3] = 0;                         //quantidade de execucoes
-			solutions.push_back(solution);
+			//pSolver->addSolution(solution);
 		}
 		else
 			deletedCount++;
@@ -424,33 +488,36 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
 		ind = selectAlpha(alphas, alphaRR, randomFloat(re));
 
-
+        cout << iterationCount << endl;
 		greedyRandomized(alphas[ind][0]);
         localSearch2();
         localSearch(alphas[ind][0]);
-        cost = solution->cost;
         localSearch3(alphas[ind][0]);
 
 		if (!solution->isFeasible(input->lowerB, input->upperB)) {
-			delete solution;
+			//delete solution;
 			deletedCount++;
 			break;
 		}
+		pSolver->addSolution(solution);
 		iterationCount++;
-		solutions.push_back(solution);
 
-		cost = solution->calculateCost();
-       cout << cost << endl;
 
+
+	//	cost = solution->calculateCost();
+		cout << "S: " << solution->groupList.size() << endl;;
+       cout << solution->calculateCost() << endl;
+        cost = solution->calculateCost();
+        cout << cost << endl;
 		if (cost > bestCost && cost != 0) {
-			delete bestS;
+			//delete bestS;
 			bestS = solution;
 			bestCost = cost;
 		}
-		else delete solution;
+		//else delete solution;
 		alphas[ind][2] += cost;
 		alphas[ind][3]++;
-
+        cout << "---------" << endl;
 		///COLOCAR PARA ATUALIZAR A CADA BETA SEGUNDOS
 		updateAlphaProbability(alphas, alphaRR, bestCost);
 
@@ -463,6 +530,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 	for (int i = 0; i < alphaRR; ++i)
 		delete[] alphas[i];
 	delete[] alphas;
+
 
 	solution = bestS;
 }

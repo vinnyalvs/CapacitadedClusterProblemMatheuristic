@@ -7,6 +7,7 @@
 
 #include "Solution.h"
 #include "Input.h"
+#include "../ExactSources/ProblemSolver.h"
 #include <random>
 #include <algorithm>
 #include <utility>
@@ -20,6 +21,7 @@ class Heuristic {
 public:
 
     Heuristic(Input* input);
+    //~Heuristic();
     void constructive(double alpha, unsigned long seed, double tRemaining);
     //void greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed);
 	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
@@ -27,6 +29,7 @@ public:
 	void localSearch2();
 	void localSearch3(double alpha);
 	void trade();
+	void runSolver();
 	unsigned int getWorstNode(Group *group);
     clock_t tInicioLeitura, tFimLeitura;
 
@@ -35,18 +38,11 @@ public:
     mt19937_64 random;
     Input *input;
     Graph* g;
+    ProblemSolver *pSolver;
     void greedyRandomized(double alpha);
 	double calculateGain(Group * G, unsigned int nodeID);
 	bool checkLowerBound(vector<Group> *groupList);
 private:
-    struct changeGroup{
-        int groupId;
-        int nodeId;
-        int removedPos;
-        double newWeight;
-        double newWeight2;
-    };
-
     //primeira fase de construcao: definir cada grupo inserindo o minimo de nos para atingir o lowerBound no grupo
 
 
