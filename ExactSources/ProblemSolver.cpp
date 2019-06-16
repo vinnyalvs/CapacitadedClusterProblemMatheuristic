@@ -95,7 +95,7 @@ void ProblemSolver::buildProblem(){
 
 	vector <double> costClusters;
 	string op = (numClusterBound == 1 ? "<=" : (numClusterBound == 2 ? "=" : ">="));
-
+    cout << numObjs << endl;
 	if (p.fixedNumClusters) {
 		newModel->addConstraint(numClusters, op, "numClusters", numClusters);
 		indCnstNumClusters = newModel->getNumConstraints() - 1;
@@ -120,7 +120,7 @@ void ProblemSolver::buildProblem(){
 			newModel->addVar(1, costs[j], "cluster" + std::to_string(newModel->getNumVars()), "int", 0);
 			int indVar = newModel->getNumVars() - 1;
 			for (int k = 0; k < clusters[j].nodeList.size(); k++) {
-				unsigned int indCnstr = clusters[j].nodeList[k];
+				unsigned int indCnstr = clusters[j].nodeList[k] + 1;
 				newModel->setConstraintCoeffs(1, indCnstr, indVar);
 			}
 			if (p.fixedNumClusters)
@@ -134,7 +134,7 @@ void ProblemSolver::buildProblem(){
 	for(int c=0;c<x.size();c++){
 		solution = floor(x[c]/numClusters);
 		clusterSol = x[c] - ((solution)*numClusters);
-		vector <Group> groups = solutions[c]->groupList;
+		vector <Group> groups = solutions[solution]->groupList;
 		clusters.push_back(groups[clusterSol]);
 
 	}

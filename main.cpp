@@ -26,7 +26,7 @@ int main(int arc, char **argv)
     endT = clock();
     elapsedT = ((endT - initialT) / (CLOCKS_PER_SEC)); // Converte tempo gasto em segundos
    // double tRemaining = 60 - (double) elapsedT;
-    h.greedyRandomizedReactive(10, 1, 10, 13);
+    h.greedyRandomizedReactive(10, 1, 100, 13);
     h.runSolver();
    // h.solution->printSolution();
     cout << "cost: " << h.solution->calculateCost() << " "<< h.solution->isFeasible(input.lowerB, input.upperB) << endl;
