@@ -138,7 +138,8 @@ void Heuristic::greedyRandomized(double alpha)
 double Heuristic::calculateGain(Group *group, unsigned int nodeId) {
 	double gain = 0.0;
 	for (auto n : group->nodeList) {
-		gain += g->edges[n][nodeId];
+		if(n != nodeId)
+			gain += g->edges[n][nodeId];
 	}
 	return gain/group->weight;
 }
@@ -146,7 +147,8 @@ double Heuristic::calculateGain(Group *group, unsigned int nodeId) {
 double Heuristic::calculateGain(Group *group, unsigned int nodeId, int aux) {
 	double gain = 0.0;
 	for (auto n : group->nodeList) {
-		gain += g->edges[n][nodeId];
+		if (n != nodeId)
+			gain += g->edges[n][nodeId];
 	}
 	return gain;
 }
@@ -286,19 +288,17 @@ void Heuristic::localSearch5(){
     std::sort(groupList.begin(), groupList.end(), [](Group lhs, Group rhs) {
 				return lhs.id < rhs.id;
     });
-    solution->printSolution();
-    cout << "--------" << endl;
-    for(auto n: groupList){
+	for (int i = 0; i <groupList.size();i++) {
         int k;
-        k = rand() % n.nodeList.size();
-        unsigned int w = n.nodeList[k];
-        if((n.weight - g->nodes[w].weight) >= input->lowerB){
-            n.removeNode(w);
-            nodesCand.push_back(w);
+      //  k = rand() % groupList[i].nodeList.size();
+		k = getWorstNode(&groupList[i]);
+       // unsigned int w = groupList[i].nodeList[k];
+        if((groupList[i].weight - g->nodes[k].weight) >= input->lowerB){
+			groupList[i].removeNode(k);
+            nodesCand.push_back(k);
         }
     }
-        solution->groupList = groupList;
-       solution->printSolution();
+
     for(auto n: nodesCand){
         int groupId = -1;
         double bestGain =0;
@@ -312,9 +312,6 @@ void Heuristic::localSearch5(){
 				}
 			}
         if (groupId != -1) {
-            cout << n << endl;
-            cout << groupId << endl;
-            cout << "--" << endl;
 			groupList[groupId].insertNode(n);
         } else{
             control = false;
@@ -331,8 +328,7 @@ void Heuristic::localSearch5(){
            solution->groupList = groupList;
         }
     }
-    cout << "-------" << endl;
-    solution->printSolution();
+
 }
 void Heuristic::localSearch4(double alpha) {
 	//cout << "LS3" << endl;
@@ -579,8 +575,8 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
         cout << iterationCount << endl;
 		greedyRandomized(alphas[ind][0]);
-       localSearch5();
-        //localSearch(alphas[ind][0]);
+        localSearch5();
+        localSearch(alphas[ind][0]);
 		//localSearch3(alphas[ind][0]);
 		if (!solution->isFeasible(input->lowerB, input->upperB)) {
 			//delete solution;
