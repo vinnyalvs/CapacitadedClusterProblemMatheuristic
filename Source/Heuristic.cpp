@@ -278,12 +278,68 @@ void Heuristic::localSearch(double alpha)
 
 }
 
+void Heuristic::localSearch5(){
+    vector <unsigned int> nodesCand;
+    bool control = true;
+    //cout << solution->cost << endl;
+    vector <Group> groupList = solution->groupList;
+    std::sort(groupList.begin(), groupList.end(), [](Group lhs, Group rhs) {
+				return lhs.id < rhs.id;
+    });
+    solution->printSolution();
+    cout << "--------" << endl;
+    for(auto n: groupList){
+        int k;
+        k = rand() % n.nodeList.size();
+        unsigned int w = n.nodeList[k];
+        if((n.weight - g->nodes[w].weight) >= input->lowerB){
+            n.removeNode(w);
+            nodesCand.push_back(w);
+        }
+    }
+        solution->groupList = groupList;
+       solution->printSolution();
+    for(auto n: nodesCand){
+        int groupId = -1;
+        double bestGain =0;
+        for (auto c : groupList) {
+				if (!((c.weight + g->nodes[n].weight) > input->upperB) ) {
+					double gain = calculateGain(&c, n);
+					if (gain > bestGain) {
+						groupId = c.id;
+						bestGain = gain;
+					}
+				}
+			}
+        if (groupId != -1) {
+            cout << n << endl;
+            cout << groupId << endl;
+            cout << "--" << endl;
+			groupList[groupId].insertNode(n);
+        } else{
+            control = false;
+            break;
+        }
+
+    }
+    if(control){
+        double newCost=0;
+        for (auto c : groupList)
+            newCost += c.cost;
+            cout  << newCost << endl;
+        if (newCost >= solution->cost) {
+           solution->groupList = groupList;
+        }
+    }
+    cout << "-------" << endl;
+    solution->printSolution();
+}
 void Heuristic::localSearch4(double alpha) {
 	//cout << "LS3" << endl;
 	bool control = false;
 	double cost = solution->cost;
 	int count = 0;
-	
+
 	while (!control) {
 		vector <Group> groupList = solution->groupList;
 		double solCost = cost;
@@ -523,9 +579,9 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
         cout << iterationCount << endl;
 		greedyRandomized(alphas[ind][0]);
-        localSearch2();
-        localSearch(alphas[ind][0]);
-		localSearch3(alphas[ind][0]);
+       localSearch5();
+        //localSearch(alphas[ind][0]);
+		//localSearch3(alphas[ind][0]);
 		if (!solution->isFeasible(input->lowerB, input->upperB)) {
 			//delete solution;
 			deletedCount++;
@@ -558,7 +614,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 		delete[] alphas[i];
 	delete[] alphas;
 
-	
+
 	solution = bestS;
 	cout << "BEST Heuristic: " << solution->calculateCost() << endl;
 }

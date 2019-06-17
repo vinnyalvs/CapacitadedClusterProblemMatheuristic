@@ -27,6 +27,7 @@ public:
 	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
 	void localSearch(double alpha);
 	void localSearch2();
+	void localSearch5();
 	void localSearch4(double alpha);
 	void localSearch3(double alpha);
 	void trade();
