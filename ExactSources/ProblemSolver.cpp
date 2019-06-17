@@ -111,7 +111,6 @@ void ProblemSolver::buildProblem(){
 	for (int i = 0; i < solutions.size(); i++) {
 		//cout << i << endl;
 		vector <double> costs;
-        cout << i << " " << solutions[i]->groupList.size() << " " << solutions[i]->cost <<  endl;
 		vector <Group> clusters = solutions[i]->groupList;
 		for(auto c: clusters){
 			costs.push_back(c.cost);

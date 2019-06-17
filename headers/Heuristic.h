@@ -27,6 +27,7 @@ public:
 	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
 	void localSearch(double alpha);
 	void localSearch2();
+	void localSearch4(double alpha);
 	void localSearch3(double alpha);
 	void trade();
 	void runSolver();
@@ -41,6 +42,7 @@ public:
     ProblemSolver *pSolver;
     void greedyRandomized(double alpha);
 	double calculateGain(Group * G, unsigned int nodeID);
+	double calculateGain(Group * group, unsigned int nodeId, int aux);
 	bool checkLowerBound(vector<Group> *groupList);
 private:
     //primeira fase de construcao: definir cada grupo inserindo o minimo de nos para atingir o lowerBound no grupo
