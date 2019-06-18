@@ -9,6 +9,7 @@
 #include "Group.h"
 #include <string>
 #include <fstream>
+#include <iostream>
 class Input {
 
 public:

@@ -178,33 +178,42 @@ unsigned int Heuristic::getWorstNode(Group *group){
 }
 
 void Heuristic::trade(){
-
+   // cout << "Trade" << endl;
     vector <Group> groupList = solution->groupList;
 	bool control = false;
 	double cost = solution->cost;
 	int count=0;
+	//cout << cost << endl;
 	while(!control){
         double solCost = cost;
         count++;
         unsigned int A = rand() % groupList.size();
         unsigned int B = rand() % groupList.size();
-        while(A != B)
+        while(A == B)
             B = rand() % groupList.size();
         Group ga = groupList[A];
         Group gb = groupList[B];
         unsigned int nodeA = getWorstNode(&ga);
         unsigned int nodeB = getWorstNode(&gb);
+       /* unsigned int nodeA = rand() % groupList[A].nodeList.size();
+        unsigned int nodeB = rand() % groupList[B].nodeList.size();
+        nodeA = groupList[A].nodeList[nodeA];
+        nodeB = groupList[B].nodeList[nodeB]; */
         double bestGain=0;
         int groupId=-1;
         double oldWA = ga.weight - g->nodes[nodeA].weight + g->nodes[nodeB].weight ;
         double oldWB = gb.weight - g->nodes[nodeB].weight + g->nodes[nodeA].weight ;
        // cout << oldW<< endl;
         if(!((oldWA) < input->lowerB) && !((oldWB) < input->lowerB) && !((oldWA) > input->upperB) && !((oldWB) > input->upperB) ){
-                   double newCA = ga.cost - calculateGain(&ga,nodeA,0); + calculateGain(&ga,nodeB,0);
-                   double newCB = gb.cost - calculateGain(&gb,nodeB,0); + calculateGain(&gb,nodeA,0);
-
+                   double newCA = ga.cost - calculateGain(&ga,nodeA,0) + calculateGain(&ga,nodeB,0);
+                 //  cout << "d****" << endl;
+                   //cout << newCA << " " << ga.cost << endl;
+                   double newCB = gb.cost - calculateGain(&gb,nodeB,0) + calculateGain(&gb,nodeA,0);
+                   //cout << newCB << " " << gb.cost << endl;
+                   //cout << (ga.cost + gb.cost) << endl;
+                   //cout << ( newCA + newCB)  << endl;
+                   //cout << "a****" << endl;
                    if( ( (ga.cost + gb.cost) < ( newCA + newCB) ) ) {
-
                           ga.removeNode(nodeA);
                           ga.insertNode(nodeB);
                           gb.insertNode(nodeA);
@@ -216,12 +225,14 @@ void Heuristic::trade(){
 
                    }
         }
-        if(count > 50)
+       // cout << count << endl;
+        if(count >300 && cost >= solCost)
             control = true;
         else
             cost = solCost;
-
 	}
+	//cout << cost << endl;
+	//cout << "---" << endl;
 }
 
 void Heuristic::localSearch(double alpha)
@@ -280,173 +291,6 @@ void Heuristic::localSearch(double alpha)
 
 }
 
-void Heuristic::localSearch5(){
-    vector <unsigned int> nodesCand;
-    bool control = true;
-    //cout << solution->cost << endl;
-    vector <Group> groupList = solution->groupList;
-    std::sort(groupList.begin(), groupList.end(), [](Group lhs, Group rhs) {
-				return lhs.id < rhs.id;
-    });
-	for (int i = 0; i <groupList.size();i++) {
-        int k;
-      //  k = rand() % groupList[i].nodeList.size();
-		k = getWorstNode(&groupList[i]);
-       // unsigned int w = groupList[i].nodeList[k];
-        if((groupList[i].weight - g->nodes[k].weight) >= input->lowerB){
-			groupList[i].removeNode(k);
-            nodesCand.push_back(k);
-        }
-    }
-
-    for(auto n: nodesCand){
-        int groupId = -1;
-        double bestGain =0;
-        for (auto c : groupList) {
-				if (!((c.weight + g->nodes[n].weight) > input->upperB) ) {
-					double gain = calculateGain(&c, n);
-					if (gain > bestGain) {
-						groupId = c.id;
-						bestGain = gain;
-					}
-				}
-			}
-        if (groupId != -1) {
-			groupList[groupId].insertNode(n);
-        } else{
-            control = false;
-            break;
-        }
-
-    }
-    if(control){
-        double newCost=0;
-        for (auto c : groupList)
-            newCost += c.cost;
-            cout  << newCost << endl;
-        if (newCost >= solution->cost) {
-           solution->groupList = groupList;
-        }
-    }
-
-}
-void Heuristic::localSearch4(double alpha) {
-	//cout << "LS3" << endl;
-	bool control = false;
-	double cost = solution->cost;
-	int count = 0;
-
-	while (!control) {
-		vector <Group> groupList = solution->groupList;
-		double solCost = cost;
-		count++;
-		std::sort(groupList.begin(), groupList.end(), [](Group lhs, Group rhs)
-		{
-			return lhs.weight > rhs.weight;
-		});
-		unsigned int A = rand() % (int)(groupList.size() * alpha);
-		Group ga = groupList[A];
-		A = ga.id;
-		unsigned int nodeA = getWorstNode(&ga);
-		double bestGain = 0;
-		int groupId = -1;
-		double oldW = ga.weight - g->nodes[nodeA].weight;
-		// cout << oldW<< endl;
-		if (!((oldW) < input->lowerB)) {
-			for (auto c : groupList) {
-				if (!((c.weight + g->nodes[nodeA].weight) > input->upperB) && c.id != ga.id) {
-					double gain = calculateGain(&c, nodeA, 0);
-					if (gain > bestGain && ((c.cost + gain) > ga.cost)) {
-						groupId = c.id;
-						bestGain = gain;
-					}
-				}
-			}
-		}
-		if (groupId != -1) {
-			//    cout << "troucou" << endl;
-			std::sort(groupList.begin(), groupList.end(), [](Group lhs, Group rhs) {
-				return lhs.id < rhs.id;
-			});
-			groupList[A].removeNode(nodeA);
-			groupList[groupId].insertNode(nodeA);
-			double newGain = 0;
-			bestGain = 0;
-			int id = -1;
-			for (auto n : groupList[groupId].nodeList) {
-				newGain = calculateGain(&groupList[A], n, 0);
-				if (newGain > bestGain && (groupList[A].weight + g->nodes[n].weight) < input->upperB) {
-					bestGain = newGain;
-					id = n;
-				}
-			}
-			if (id != -1) {
-				groupList[groupId].removeNode(id);
-				groupList[A].insertNode(id);
-				double newCost = 0;
-				for (auto c : groupList)
-					newCost += c.cost;
-				if (newCost >= solCost) {
-					solution->groupList = groupList;
-					solCost = solution->calculateCost();
-
-				}
-			}
-		}
-		if (count > 10)
-			control = true;
-	}
-
-}
-
-void Heuristic::localSearch3(double alpha){
-   // system("cls");
-    //cout << "LS3" << endl;
-	bool control = false;
-	double cost = solution->cost;
-	int count=0;
-	while(!control){
-		vector <Group> groupList = solution->groupList;
-        double solCost = cost;
-        count++;
-        unsigned int A = rand() % (int)(groupList.size() * alpha);
-        Group ga = groupList[A];
-        Group gb;
-        A = ga.id;
-        unsigned int nodeA = getWorstNode(&ga);
-        double bestGain=0;
-        int groupId=-1;
-        double oldW = ga.weight - g->nodes[nodeA].weight;
-       // cout << oldW<< endl;
-        if(!((oldW) < input->lowerB)){
-            for(auto c: groupList){
-                if(!((c.weight + g->nodes[nodeA].weight) > input->upperB) && c.id != ga.id){
-                   double gain = calculateGain(&c,nodeA,0);
-                   if(gain > bestGain && ( (c.cost + gain) > ga.cost ) )
-                        groupId = c.id;
-                        bestGain = gain;
-                }
-            }
-        }
-        if(groupId != -1){
-        //    cout << "troucou" << endl;
-            std::sort(groupList.begin(), groupList.end(), [](Group lhs, Group rhs){
-                return lhs.id < rhs.id;
-            });
-            groupList[A].removeNode(nodeA);
-            groupList[groupId].insertNode(nodeA) ;
-			double newCost=0;
-			for (auto c : groupList)
-				newCost += c.cost;
-			if (newCost >= solCost) {
-				solution->groupList = groupList;
-				solCost = solution->calculateCost();
-			}
-        }
-        if(count > 10)
-            control = true;
-	}
-}
 
 void Heuristic::localSearch2(){
    // cout << "LS2" << endl;
@@ -460,7 +304,6 @@ void Heuristic::localSearch2(){
 	int count=0;
 	while(!control){
 		vector <Group> groupList = groupListAux;
-
         double solCost = cost;
         count++;
         unsigned int A = rand() % groupList.size();
@@ -483,7 +326,6 @@ void Heuristic::localSearch2(){
             }
         }
         if(groupId != -1){
-           // cout << "troucou" << endl;
 			double newCost = 0;
             groupList[A].removeNode(nodeA);
             groupList[groupId].insertNode(nodeA) ;
@@ -494,10 +336,8 @@ void Heuristic::localSearch2(){
 				solCost = solution->calculateCost();
 			}
         }
-        if(count > 200)
+        if(count > 10)
             control = true;
-
-
 	}
 }
 
@@ -520,6 +360,9 @@ void Heuristic::runSolver(){
 	vector <Group> groupList = pSolver->getClusters();
 	solution->groupList = groupList;
 	cout << "Solução : " << solution->calculateCost() << "Viabilidade " << solution->isFeasible(input->lowerB,input->upperB) <<  endl;
+	ofstream f;
+    f.open("sols.txt",ios::app);
+	f << solution->cost << endl;
 	delete pSolver;
 
 
@@ -575,8 +418,9 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
         cout << iterationCount << endl;
 		greedyRandomized(alphas[ind][0]);
-        localSearch5();
-        localSearch(alphas[ind][0]);
+		localSearch(alphas[ind][0]);
+        trade();
+
 		//localSearch3(alphas[ind][0]);
 		if (!solution->isFeasible(input->lowerB, input->upperB)) {
 			//delete solution;
@@ -613,6 +457,9 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
 	solution = bestS;
 	cout << "BEST Heuristic: " << solution->calculateCost() << endl;
+	ofstream f;
+    f.open("solsH.txt",ios::app);
+	f << solution->cost << endl;
 }
 
 void Heuristic::updateAlphaProbability(double **alphas, int alphaRR, double bestCost)

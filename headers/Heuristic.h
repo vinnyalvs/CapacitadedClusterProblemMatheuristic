@@ -31,6 +31,7 @@ public:
 	void localSearch4(double alpha);
 	void localSearch3(double alpha);
 	void trade();
+	void trade2();
 	void runSolver();
 	unsigned int getWorstNode(Group *group);
     clock_t tInicioLeitura, tFimLeitura;
