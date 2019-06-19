@@ -19,7 +19,7 @@ int main(int arc, char **argv)
    Input input;
    input.readInstance(argv[1], 1);
    Heuristic h(&input);
-   h.greedyRandomizedReactive(10, 1, 1000, 13);
+   h.greedyRandomizedReactive(10, 1, 100, 13);
    //h.runSolver();
    cout << "--------------" << endl;
 

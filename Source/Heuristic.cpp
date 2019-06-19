@@ -185,8 +185,8 @@ void Heuristic::trade(){
 	bool control = false;
 	double cost = solution->cost;
 	int count=0;
+    double solCost = backup->cost;
 	while(!control){
-        double solCost = cost;
         count++;
         unsigned int A = rand() % groupList.size();
         unsigned int B = rand() % groupList.size();
@@ -196,10 +196,6 @@ void Heuristic::trade(){
         Group gb = groupList[B];
         unsigned int nodeA = getWorstNode(&ga);
         unsigned int nodeB = getWorstNode(&gb);
-       /* unsigned int nodeA = rand() % groupList[A].nodeList.size();
-        unsigned int nodeB = rand() % groupList[B].nodeList.size();
-        nodeA = groupList[A].nodeList[nodeA];
-        nodeB = groupList[B].nodeList[nodeB]; */
         double bestGain=0;
         int groupId=-1;
         double oldWA = ga.weight - g->nodes[nodeA].weight + g->nodes[nodeB].weight ;
@@ -216,17 +212,23 @@ void Heuristic::trade(){
                           groupList[A] = ga;
                           groupList[B] = gb;
                           backup->groupList = groupList;
-                          solCost = backup->calculateCost();
+                          double c = backup->calculateCost();
+                          //solCost = backup->calculateCost();
 
                    }
         }
-       // cout << count << endl;
-        if(count >1000 && cost >= solCost)
+       if((solCost >= backup->cost))
+            count++;
+         else{
+            count = 0;
+            solCost = backup->cost;
+        }
+        if(count > 1000)
             control = true;
-        else 
-        	cost = solCost;
-        
-       
+
+
+
+
 	}
     if(solution->cost < backup->cost){
         solution->groupList = backup->groupList;
@@ -238,12 +240,10 @@ void Heuristic::trade2(){
 	Solution *backup = new Solution();
     backup->cost = solution->cost;
     backup->groupList = solution->groupList;
-   // cout << "Trade" << endl;
     vector <Group> groupList = backup->groupList;
 	bool control = false;
 	double cost = backup->cost;
 	int count=0;
-	//cout << cost << endl;
 	while(!control){
         double solCost = backup->cost;
         count++;
@@ -263,7 +263,6 @@ void Heuristic::trade2(){
         int groupId=-1;
         double oldWA = ga.weight - g->nodes[nodeA].weight  - g->nodes[nodeA2].weight + g->nodes[nodeB].weight ;
         double oldWB = gb.weight - g->nodes[nodeB].weight + g->nodes[nodeA].weight  + g->nodes[nodeA2].weight ;
-       // cout << oldW<< endl;
         if(!((oldWA) < input->lowerB) && !((oldWB) < input->lowerB) && !((oldWA) > input->upperB) && !((oldWB) > input->upperB) ){
                    double newCA = ga.cost - calculateGain(&ga,nodeA,0) - calculateGain(&ga,nodeA2,0) + calculateGain(&ga,nodeB,0);
                    double newCB = gb.cost - calculateGain(&gb,nodeB,0) + calculateGain(&gb,nodeA,0) + calculateGain(&ga,nodeA2,0);
@@ -281,14 +280,17 @@ void Heuristic::trade2(){
                             newCost += c.cost;
                           if (newCost >= solCost) {
                             backup->groupList = groupList;
-                            solCost = backup->calculateCost();
+                            //solCost = backup->calculateCost();
+                            backup->cost = newCost;
                           } else
                             groupList = backup->groupList;
         }
-       // cout << count << endl;
-
 	}
-        if(count >100000)
+        if((solCost >= backup->cost))
+            count++;
+         else
+            count =0;
+        if(count > 1000)
             control = true;
  }
  	if(solution->cost < backup->cost){
@@ -302,9 +304,6 @@ void Heuristic::trade2(){
 
 void Heuristic::localSearch(double alpha)
 {
-    //1-opt
-	//Sortear (todos os nos) no e colocar no melhor possivel enquanto ha melhora (ou duas vezes)
-	//pre calcular(x e y)
     Solution *backup = new Solution();
     backup->cost = solution->cost;
     backup->groupList = solution->groupList;
@@ -313,28 +312,27 @@ void Heuristic::localSearch(double alpha)
     bool control = false;
     int count =0;
     double cost = backup->cost;
-    cout << "O " << cost < endl;
+
     while(!control){
     double solCost = cost;
 	vector <Group> groupList = backup->groupList;
 	for(auto node:nodes){
         int oldGroupId = backup->getGroup(node.id);
         double oldCost = groupList[oldGroupId].cost;
-        double newCost=0.0;
+       // double newCost=0;
         double oldWeight = groupList[oldGroupId].weight;
         double bestGain=0;
-
         int groupId=-1;
-
         double newWeight = oldWeight - node.weight;
+       // cout << oldW<< endl;
         if(!(newWeight < input->lowerB)){
             for(auto c: groupList){
                 if(!((c.weight + node.weight) > input->upperB) && c.id != oldGroupId){
                    double gain = calculateGain(&c,node.id,0);
-                   if(gain > bestGain && ((c.cost + gain) > oldCost ))
+                   if(gain > bestGain && ( (c.cost + gain) > oldCost ) )
                         groupId = c.id;
                         bestGain = gain;
-                        newCost = c.cost + gain;
+                        //newCost = c.cost + gain
                 }
             }
         }
@@ -342,11 +340,12 @@ void Heuristic::localSearch(double alpha)
         if(groupId != -1){
             groupList[oldGroupId].removeNode(node.id);
             groupList[groupId].insertNode(node.id) ;
-			double newCostS = newCost - oldCost;
-			if (newCostS >= solCost) {
+			double newCost = 0;
+			for (auto c : groupList)
+				newCost += c.cost;
+			if (newCost >= solCost) {
 				backup->groupList = groupList;
-				backup->cost = newCostS;
-				solCost = newCostS;
+				solCost = backup->calculateCost();
 			}
         }
 	}
@@ -359,8 +358,10 @@ void Heuristic::localSearch(double alpha)
         solution->groupList = backup->groupList;
         solution->cost = backup->cost;
     }
-    cout << "S " << cost << endl;
+
 }
+
+
 
 
 void Heuristic::localSearch2(){
@@ -490,11 +491,10 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
         cout << iterationCount << endl;
 		greedyRandomized(alphas[ind][0]);
-		cout << "batata" << endl;
 		localSearch(alphas[ind][0]);
 		//if(iterationCount % 2 == 0 )
-        //trade();
-      //  trade2();
+        trade();
+        trade2();
 
 
 		if (!solution->isFeasible(input->lowerB, input->upperB)) {
@@ -532,7 +532,6 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 
 	solution = bestS;
 	cout << "BEST Heuristic: " << solution->calculateCost() << endl;
-	cout << "BEST Cost: " << bestCost << endl;
 	ofstream f;
     f.open("solsH.txt",ios::app);
 	f << solution->cost << endl;

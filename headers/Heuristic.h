@@ -7,6 +7,7 @@
 
 #include "Solution.h"
 #include "Input.h"
+#include <string>
 #include "../ExactSources/ProblemSolver.h"
 #include <random>
 #include <algorithm>
