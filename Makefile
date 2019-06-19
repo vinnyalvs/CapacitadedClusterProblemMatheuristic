@@ -1,8 +1,8 @@
 CC=g++
 
-INC=-DIL_STD -I/opt/ibm/ILOG/CPLEX_Studio128/cplex/include -I/opt/ibm/ILOG/CPLEX_Studio128/concert/include
+INC=-DIL_STD -I/home/getcomp06/Documentos/Vinicius/Cplex/cplex/include -I/home/getcomp06/Documentos/Vinicius/Cplex/concert/include
 
-LIB =-L/opt/ibm/ILOG/CPLEX_Studio128/concert/lib/x86-64_linux/static_pic/ -L/opt/ibm/ILOG/CPLEX_Studio128/cplex/lib/x86-64_linux/static_pic/
+LIB =-L/home/getcomp06/Documentos/Vinicius/Cplex/concert/lib/x86-64_linux/static_pic/ -L/home/getcomp06/Documentos/Vinicius/Cplex/cplex/lib/x86-64_linux/static_pic/
 
 CFLAGS=-c -std=c++11 -O2 -Wno-ignored-attributes
 

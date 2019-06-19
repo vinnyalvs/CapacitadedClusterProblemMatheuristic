@@ -1,4 +1,4 @@
 clear
 make
 
-./Solve Instancias/RanReal480/RanReal480_05.txt
+./Solve /home/getcomp06/Documentos/Vinicius/CCP/RanReal240/RanReal240_01.txt
