@@ -9,8 +9,7 @@
 
 using namespace std;
 
-void run(const string &instanceList, string outputPath);
-void verifySolution(string path,string originalPath,int type);
+
 
 int main(int arc, char **argv)
 {
@@ -20,7 +19,7 @@ int main(int arc, char **argv)
    input.readInstance(argv[1], 1);
    Heuristic h(&input);
   // h.greedyRandomized2(0.1);
-   h.greedyRandomizedReactive(10, 1, 100, 13);
+   h.greedyRandomizedReactive(10, 1, 1000, 13);
    //h.runSolver();
    cout << "--------------" << endl;
 
