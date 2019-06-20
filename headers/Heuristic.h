@@ -26,11 +26,9 @@ public:
     void constructive(double alpha, unsigned long seed, double tRemaining);
     //void greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed);
 	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
+
 	void localSearch(double alpha);
-	void localSearch2();
-	void localSearch5();
-	void localSearch4(double alpha);
-	void localSearch3(double alpha);
+	void shake();
 	void trade();
 	void trade2();
 	void runSolver();
@@ -44,15 +42,17 @@ public:
     Graph* g;
     ProblemSolver *pSolver;
     void greedyRandomized(double alpha);
+    void greedyRandomized2(double alpha);
 	double calculateGain(Group * G, unsigned int nodeID);
 	double calculateGain(Group * group, unsigned int nodeId, int aux);
+	unsigned int getBigNodeNotInSol(vector <Node> *nodesInSol, vector <Node> * nodesNotInSol, int *aux);
 	bool checkLowerBound(vector<Group> *groupList);
 private:
     //primeira fase de construcao: definir cada grupo inserindo o minimo de nos para atingir o lowerBound no grupo
 
 
-    void phase2(vector <Group> groupList, vector <Node> *nodelist, double alpha);
-	void phase3(vector <Group> *groupList, vector <Node> nodelist);
+    void phase2(vector <Group> *groupList, vector <Node> *nodelist, double alpha);
+	void phase3(vector <Group> *groupList, vector <Node> *nodelist, double alpha);
     int swapFix();
     int fixSolution();
 

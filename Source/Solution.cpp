@@ -114,12 +114,14 @@ bool Solution::isFeasible(double lowerB,double upperB){
     int i=0;
 	sort(list.begin(), list.end());
     for(auto c: list) {
+
 		if (list[abs(list[i])] >= 0) {
 
 			list[abs(list[i])] = -list[abs(list[i])];
 
 		}
 		else {
+
             cout << "nos repetidos" << endl;
             return false;
 		}
