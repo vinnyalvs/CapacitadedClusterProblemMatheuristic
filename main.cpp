@@ -19,8 +19,8 @@ int main(int arc, char **argv)
    input.readInstance(argv[1], 1);
    Heuristic h(&input);
   // h.greedyRandomized2(0.1);
-   h.greedyRandomizedReactive(10, 1, 1000, 13);
-   //h.runSolver();
+   h.greedyRandomizedReactive(10, 1, 10, 13);
+   h.runSolver();
    cout << "--------------" << endl;
 
     return 0;
