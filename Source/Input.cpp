@@ -102,30 +102,43 @@ void Input::readType2(string path)
         cout << "Falha na leitura da instancia!" << endl;
 }
 
-/*  struct changeGroup c;
-            c.groupId = i.id;
-            k = 0;
-            oldWeight = i.weight;
-            for(auto j: i.nodeList ){
-               double newWeight = i.weight + g->nodes[nodeId].weight  - g->nodes[j].weight;
-               double newWeight2 = newSol->groupList[group1].weight - g->nodes[nodeId].weight + g->nodes[j].weight;
-                if (newWeight <= input->upperB  && (newWeight > input->lowerB ) && oldWeight < newWeight ) {
-                    canEnterG1 = true;
-                }
-                if ( newWeight2 <= input->upperB &&  newWeight2 > input->lowerB && newSol->groupList[group1].weight < newWeight ) {
-                    canEnterG2 = true;
-                }
-                if(canEnterG1 && canEnterG2){
-                    c.nodeId = j;
-                    c.removedPos = k;
-                    cg.push_back(c);
-                    c.newWeight = newWeight;
-                    c.newWeight2 = newWeight2;
-               }
-                k++;
-            }
+void Input::readSolution(string path) {
+	ifstream reader;
+	reader.open(path);
+	string aux = " ";
+	unsigned int q;
+	for (int i = 0; i < 12; i++) {
+		vector <int> a;
+		clusters.push_back(a);
+	}
+	int count = 0;
+	if (reader.is_open())
+	{
 
-            for(auto c : cg){
-                double newWeight;
+		// object from the class stringstream 
 
-            } */
+
+		// The object has the value 12345 and stream 
+		// it to the integer x 
+		while (count < 12) {
+			while (aux != ";") {
+				reader >> aux;
+				stringstream geek(aux);
+				cout << aux << endl;
+				if (aux == ";")
+					break;
+				int x;
+				geek >> x;
+				clusters[count].push_back(x);
+			}
+			aux = " ";
+			count++;
+		}
+
+	}
+	else
+		cout << "Falha na leitura da instancia!" << endl; 
+
+}
+	
+

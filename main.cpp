@@ -13,13 +13,18 @@ using namespace std;
 
 int main(int arc, char **argv)
 {
+  srand(13);
    string instanceList = "../CCP/Instancias/instanceList.txt";
    string outputPath = "../CPP/output.txt";
+   string path = "C:/Users/HAL/Documents/GitHub/TCCExatas/Sol.txt";
    Input input;
    input.readInstance(argv[1], 1);
-   Heuristic h(&input);
-  // h.greedyRandomized2(0.1);
-   h.greedyRandomizedReactive(10, 1, 10, 13);
+ //  input.readSolution(path);
+    Heuristic h(&input);
+	//h.buildSolFromFile(input.clusters);
+  //h.greedyRandomized2(0.1);
+		
+   h.greedyRandomizedReactive(10, 1, 100, 13);
    h.runSolver();
    cout << "--------------" << endl;
 

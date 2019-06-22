@@ -26,15 +26,19 @@ public:
     void constructive(double alpha, unsigned long seed, double tRemaining);
     //void greedyRandomizedReactive(int alphaRR, int betaRR, double tRemaining, unsigned long seed);
 	void greedyRandomizedReactive(int alphaRR, int betaRR, int numIterations, unsigned long seed);
-
+	void buildSolFromFile(vector<vector<int>> clusters);
 	void localSearch(double alpha);
+	void construtivo();
+	void BestVG(Group * group, vector<Node>* nodesNotInSol);
+	void BestGV(int node, vector<Group>* groupList);
+	void swapShake();
 	void shake();
 	void trade();
 	void trade2();
 	void runSolver();
 	unsigned int getWorstNode(Group *group);
     clock_t tInicioLeitura, tFimLeitura;
-
+	vector <Node> nodeInSol;
     Solution* solution;
     vector <Solution*> solutions;
     mt19937_64 random;

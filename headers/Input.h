@@ -10,6 +10,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <sstream> 
 class Input {
 
 public:
@@ -18,11 +19,13 @@ public:
     double lowerB;
     double upperB;
     Graph *g;
-
+	vector <vector<int>> clusters;
     void readInstance(string path, int type);
+	void readSolution(string path);
 private:
     void readType1(string path);
     void readType2(string path);
+
 };
 
 

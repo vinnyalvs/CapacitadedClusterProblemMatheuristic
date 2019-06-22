@@ -36,11 +36,11 @@ double Solution::calculateCost()
 {
     double sum = 0.0;
     //Para cada grupo
-    for (auto i : groupList)
-    {
-        sum += i.cost;
-    }
-
+	for (auto i : groupList)
+	{
+		sum += i.cost;
+		
+	}
     cost = sum;
     return sum;
 }
