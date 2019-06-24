@@ -24,7 +24,7 @@ int main(int arc, char **argv)
 	//h.buildSolFromFile(input.clusters);
   //h.greedyRandomized2(0.1);
 		
-   h.greedyRandomizedReactive(10, 1, 100, 13);
+   h.greedyRandomizedReactive(10, 1, 1, 13);
    h.runSolver();
    cout << "--------------" << endl;
 

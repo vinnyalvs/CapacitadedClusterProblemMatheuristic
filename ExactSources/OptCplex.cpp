@@ -54,7 +54,7 @@ void CplexModel::addVar(double upperbound, double obj, string name, string type,
 	}
 	try {
 		vars.add(IloNumVar(env, lowerbound, upperbound, t, name.c_str()));
-		coeffsObj.push_back(around((float)obj));
+		coeffsObj.push_back(obj);
 		numVars++;
 	}
 	catch (IloException& ex) {
@@ -265,7 +265,7 @@ void CplexModel::buildModel(string sense)
 
         cplex.exportModel("arquivo.lp");
 		cout << "----------------------------------------" << endl;
-		cplex.setParam(IloCplex::EpRHS, 1e-1);
+	//	cplex.setParam(IloCplex::EpRHS, 1e-1);
 		cplex.solve();
 
 

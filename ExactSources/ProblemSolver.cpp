@@ -116,7 +116,7 @@ void ProblemSolver::buildProblem(){
 			costs.push_back(c.cost);
 		}
 		for (int j = 0; j < numClusters; j++) {
-			newModel->addVar(1, (int)costs[j], "cluster" + std::to_string(newModel->getNumVars()), "int", 0);
+			newModel->addVar(1, costs[j], "cluster" + std::to_string(newModel->getNumVars()), "int", 0);
 			int indVar = newModel->getNumVars() - 1;
 			for (int k = 0; k < clusters[j].nodeList.size(); k++) {
 				unsigned int indCnstr = clusters[j].nodeList[k] + 1;
