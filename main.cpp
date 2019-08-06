@@ -13,7 +13,7 @@ using namespace std;
 
 int main(int arc, char **argv)
 {
-  srand(13);
+/*srand(13);
    string instanceList = "../CCP/Instancias/instanceList.txt";
    string outputPath = "../CPP/output.txt";
    string path = "C:/Users/HAL/Documents/GitHub/TCCExatas/Sol.txt";
@@ -26,7 +26,7 @@ int main(int arc, char **argv)
 		
    h.greedyRandomizedReactive(10, 1, 1, 13);
    h.runSolver();
-   cout << "--------------" << endl;
+   cout << "--------------" << endl; */
 
     return 0;
 }

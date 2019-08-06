@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Opt.h"
-#include "Environment.h"
+#include "../GurobiCplexInterface/Opt.h"
+#include "../GurobiCplexInterface/Environment.h"
 #include "../headers/Solution.h"
 #include "../headers/Input.h"
 class ProblemSolver
@@ -38,4 +38,3 @@ public:
 	vector<int> objByCluster;
 
 };
-

@@ -1,4 +1,4 @@
-#include "ProblemSolver.h"
+#include "../headers/ProblemSolver.h"
 
 enum {
 	EXATO,
@@ -66,20 +66,11 @@ void ProblemSolver::setParams(Param p)
 
 void ProblemSolver::solveProblem()
 {
-	// build Master Problem
-	//mProblem.setEnvironment(env);
+	
     cout << "Chamando Resolvedor" << endl;
 	buildProblem();
 
-/*	objByCluster.assign(numObjs, 0);
 
-	clusters = mProblem.getClusters();
-
-	for (int i = 0; i < clusters.size(); i++) {
-		for (int j = 0; j < clusters[i].size(); j++) {
-			objByCluster[clusters[i][j] - 1] = i;
-		}
-	}  */
 
 
 }
@@ -144,6 +135,5 @@ vector<Group> ProblemSolver::getClusters()
 {
 	 return clusters ;
 }
-
 
 
