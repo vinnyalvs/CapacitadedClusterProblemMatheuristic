@@ -35,6 +35,7 @@ public:
 	void shake();
 	void trade();
 	void trade2();
+	void newTrade2();
 	void runSolver();
 	unsigned int getWorstNode(Group *group);
     clock_t tInicioLeitura, tFimLeitura;

@@ -30,6 +30,7 @@ public:
 	void setParams(Param p);
 	void solveProblem();
 	void buildProblem();
+	void newBuildProblem();
 
 
 
