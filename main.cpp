@@ -23,7 +23,7 @@ int main(int arc, char **argv)
    Heuristic h(&input);
   //h.greedyRandomized2(0.1);
 		
-   h.greedyRandomizedReactive(10, 1, 500, 13);
+   h.greedyRandomizedReactive(10, 1, 1000, 13);
    h.runSolver();
    cout << "--------------" << endl; 
 

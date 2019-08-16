@@ -9,7 +9,7 @@ Heuristic::Heuristic(Input *input)
 	solution = new Solution;
 	this->input = input;
 	this->g = input->g;
-	pSolver = new ProblemSolver(1,input->g->order,input->K);
+	pSolver = new ProblemSolver(-1,input->g->order,input->K);
 }
 
 void Heuristic::constructive(double alpha, unsigned long seed, double tRemaining)
@@ -146,7 +146,7 @@ void Heuristic::swapShake() {
 		best->groupList = solution->groupList;
 		best->cost = solution->cost;
 		int count = 0;
-		while (count <= 100)
+		while (count <= 1000)
 		{
 			count++;
 			vector<int> candNovo;
@@ -753,8 +753,8 @@ void Heuristic::runSolver(){
 		//cout  << i << endl;
 		pSolver->addSolution(solution);
 	} */
-	//pSolver->solveProblem();
-	pSolver->newBuildProblem();
+	pSolver->solveProblem();
+	//pSolver->newBuildProblem();
 	vector <Group> groupList = pSolver->getClusters();
 	solution->groupList = groupList;
 	cout << "Solução : " << solution->calculateCost() << "Viabilidade " << solution->isFeasible(input->lowerB,input->upperB) <<  endl;

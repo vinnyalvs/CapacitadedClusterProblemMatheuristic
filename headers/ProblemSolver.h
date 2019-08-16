@@ -4,6 +4,7 @@
 #include "../GurobiCplexInterface/Environment.h"
 #include "../headers/Solution.h"
 #include "../headers/Input.h"
+#include <ctime>
 class ProblemSolver
 {
 private:

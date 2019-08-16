@@ -74,77 +74,72 @@ void ProblemSolver::solveProblem()
 
 
 }
-void ProblemSolver::buildProblem(){
-	Model *newModel = env->getMdlCplex();
+void ProblemSolver::buildProblem() {
+	Model * newModel = NULL;
+	Environment *env = new Environment(solver);
+	newModel = env->getModel();
 	int indCnstNumClusters;
 	int numClusterBound = 2; // Numero de clusters é fixo
-
+	clock_t t = clock();
 	const int numAllClusters = solutions.size() * numClusters;
-	double **coeffs = new double*[numObjs+1];
-	for (int i = 0; i < numObjs+1; i++) {
-		coeffs[i] = new double[numAllClusters];
-		for (int j = 0; j < numAllClusters; j++) {
-			coeffs[i][j] = 0;
-		}
-	}
 
 	vector <int> exprs;
 	exprs.assign(numObjs, 0);
-	vector <double> costClusters;
+
+
 	string op = (numClusterBound == 1 ? "<=" : (numClusterBound == 2 ? "=" : ">="));
-	for (int j = 0; j < numObjs; j++) {
-		newModel->addConstraint(1, "=", "ConstrObject" + std::to_string(j), 1);
-	}
-	if(p.fixedNumClusters) {
+	cout << numObjs << endl;
+	if (p.fixedNumClusters) {
 		newModel->addConstraint(numClusters, op, "numClusters", numClusters);
 		indCnstNumClusters = newModel->getNumConstraints() - 1;
 	}
-    //system("clear");
+	for (int j = 0; j < numObjs; j++) {
+		newModel->addConstraint(1, "=", "ConstrObject" + std::to_string(j), 1);
+	}
+	//system("clear");
 	int countCluster = 0;
 	cout << "------------" << endl;
 	cout << "Sol:" << solutions.size() << endl;
 
 	for (int i = 0; i < solutions.size(); i++) {
-		cout << i << endl;
-		vector <double> costs;
+		//cout << i << endl;
+		vector <int> costs;
 		vector <Group> clusters = solutions[i]->groupList;
-		for(auto c: clusters){
+		for (auto c : clusters) {
 			costs.push_back(c.cost);
 		}
 		for (int j = 0; j < numClusters; j++) {
 			newModel->addVar(1, costs[j], "cluster" + std::to_string(newModel->getNumVars()), "int", 0);
 			int indVar = newModel->getNumVars() - 1;
 			for (int k = 0; k < clusters[j].nodeList.size(); k++) {
-				unsigned int indCnstr = clusters[j].nodeList[k];
-				coeffs[indCnstr][indVar] = 1;
+				unsigned int indCnstr = clusters[j].nodeList[k] + 1;
 				newModel->setConstraintCoeffs(1, indCnstr, indVar);
 			}
 			if (p.fixedNumClusters)
-				coeffs[indCnstNumClusters][indVar] = 1;
-				//newModel->setConstraintCoeffs(1, indCnstNumClusters, indVar);
-			}
+				newModel->setConstraintCoeffs(1, indCnstNumClusters, indVar);
+		}
 	}
 
-	newModel->setAllVarsConstraintCoeffs(coeffs);
 	newModel->buildModel("maximize");
 	vector <int> x = newModel->getVarsInSol();
 	int solution, clusterSol;
-	for(int c=0;c<x.size();c++){
-		solution = floor(x[c]/numClusters);
+	for (int c = 0; c<x.size(); c++) {
+		solution = floor(x[c] / numClusters);
 		clusterSol = x[c] - ((solution)*numClusters);
 		vector <Group> groups = solutions[solution]->groupList;
 		clusters.push_back(groups[clusterSol]);
 
 	}
+	cout << (clock() - t) / (double)CLOCKS_PER_SEC << endl;
 
 }
-
 void ProblemSolver::newBuildProblem() {
 	
 	GRBEnv* env = 0;
 	GRBVar* open = 0;
 	int aux = 0;
 	GRBLinExpr exprFixed = 0;
+	clock_t t = clock();
 	try {
 		const int numAllClusters = solutions.size() * numClusters;
 		// Model
@@ -152,7 +147,8 @@ void ProblemSolver::newBuildProblem() {
 		GRBModel model = GRBModel(*env);
 		model.set(GRB_StringAttr_ModelName, "CCP");
 		open = model.addVars(numAllClusters, GRB_BINARY);
-		vector <double> costs;
+		//open = model.addVars(numAllClusters, GRB_INTEGER);
+		vector <int> costs;
 		for (int i = 0; i < solutions.size(); i++) {
 			vector <Group> clusters = solutions[i]->groupList;
 			for (int j = 0; j < numClusters; j++) {
@@ -162,14 +158,16 @@ void ProblemSolver::newBuildProblem() {
 
 		for (int i = 0; i < numAllClusters; i++) {
 			ostringstream cname;
-			cname << "cluster " << i;
-			open[i].set(GRB_DoubleAttr_Obj, (costs[i]*100)/100);
+			cname << "cluster" << i;
+			//open[i].set(GRB_DoubleAttr_UB, 1.0);
+			//open[i].set(GRB_DoubleAttr_LB, 0.0);
+			open[i].set(GRB_DoubleAttr_Obj, costs[i]);
 			open[i].set(GRB_StringAttr_VarName, cname.str());
 			exprFixed += open[i];
 		}
 
 		ostringstream vname;
-		vname << "clusterFixed";
+		vname << "NumClusterFixed";
 		model.addConstr(exprFixed == numClusters, vname.str());
 		cout << "fim " << endl;
 
@@ -177,18 +175,19 @@ void ProblemSolver::newBuildProblem() {
 		for (int i = 0; i < numObjs; i++) {
 			GRBLinExpr expr = 0;
 			ostringstream cname;
-			cname << "indCnstr " << i;
+			cname << "Objeto" << i;
 			for (int s = 0; s < solutions.size(); s++) {
-				expr += open[solutions[s]->getGroup(i)] ;
+				expr += open[solutions[s]->getGroup(i) + 12*s] ;
 			}
 			model.addConstr(expr == 1, cname.str());
 		}
 
-		//model.write("file.txt");
-		model.write("out.lp");
+		model.write("file.lp");
+		model.write("model.mps");
 		model.update();
 		model.set(GRB_IntAttr_ModelSense, GRB_MINIMIZE);
 		model.optimize();
+		cout << (clock() - t) / (double) CLOCKS_PER_SEC << endl;
 	}
 	catch (GRBException e) {
 		cout << "Error code = " << e.getErrorCode() << endl;
