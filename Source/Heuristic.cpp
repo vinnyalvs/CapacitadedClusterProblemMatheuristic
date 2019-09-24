@@ -85,8 +85,11 @@ void Heuristic::construtivo()
 		return lhs.id < rhs.id;
 	});
 	solution->groupList = groupList;
-	cout << solution->isFeasible(input->lowerB,input->upperB) << endl;
-	cout << solution->calculateCost() << endl;
+	solution->calculateCost();
+	pSolver->addSolution(solution);
+	nodeInSol.clear();
+//	cout << solution->isFeasible(input->lowerB,input->upperB) << endl;
+//	cout << solution->calculateCost() << endl;
 }
 
 void Heuristic::BestVG(Group *group, vector <Node> *nodesNotInSol)
@@ -146,7 +149,7 @@ void Heuristic::swapShake() {
 		best->groupList = solution->groupList;
 		best->cost = solution->cost;
 		int count = 0;
-		while (count <= 1000)
+		while (count <= 10000)
 		{
 			count++;
 			vector<int> candNovo;
@@ -282,24 +285,26 @@ void Heuristic::phase2(vector <Group> *groupList,vector <Node> *nodesNotInSol, d
     bool control = false;
 	int count = 0;
 	vector <Group> okGroups;
-	vector <Group> groupCandidates = *groupList;
+	vector <Group> groupCandidates;
+	Group grupo;
+	groupCandidates = *groupList;
 	while (!control) {
-		std::sort(groupCandidates.begin(), groupCandidates.end(), [](Group lhs, Group rhs)
+		std::sort(groupList->begin(), groupList->end(), [](Group lhs, Group rhs)
 		{
 			return lhs.cost > rhs.cost;
 		});
 		int bestNode = -1;
 		double bestGain = 0.0;
-		int group = rand() % groupCandidates.size() * alpha;
+		int group = rand() % groupList->size() * alpha;
 		for (int k = 0; k < nodesNotInSol->size(); k++) {
-            double gain = calculateGain(&groupCandidates[group], nodesNotInSol->at(k).id);
+            double gain = calculateGain(&groupList->at(group), nodesNotInSol->at(k).id);
 				if (gain > bestGain) {
 					bestNode = nodesNotInSol->at(k).id; //groupCandidates[groupId].id;
 					bestGain = gain;
 				}
 		}
 		if (bestNode != -1) {
-			groupCandidates[group].insertNode(bestNode);
+			groupList->at(group).insertNode(bestNode);
 			int i;
 			for (i = 0; i<nodesNotInSol->size(); i++)
 				if (nodesNotInSol->at(i).id == bestNode)
@@ -307,18 +312,18 @@ void Heuristic::phase2(vector <Group> *groupList,vector <Node> *nodesNotInSol, d
 			nodesNotInSol->erase(nodesNotInSol->begin() + i);
 		}
 		vector <Group>::iterator it;
-		for (it = groupCandidates.begin(); it != groupCandidates.end();) {
+		for (it = groupList->begin(); it != groupList->end();) {
 			if(it->weight >= input->lowerB) {
 				okGroups.push_back(*it);
-				it = groupCandidates.erase(it);
+				it = groupList->erase(it);
 			}
 			else {
 				it++;
 			}
 		}
-		if (groupCandidates.size() == 0) {
+		if (groupList->size() == 0) {
 			for (auto c : okGroups)
-				groupCandidates.push_back(c);
+				groupList->push_back(c);
 			control = true;
 		}
 			
@@ -326,12 +331,11 @@ void Heuristic::phase2(vector <Group> *groupList,vector <Node> *nodesNotInSol, d
 			control = true;
 		}
 	}
-	*groupList = groupCandidates;
+	//*groupList = groupCandidates;
 }
 
 void Heuristic::phase3(vector <Group> *groupList,vector <Node> *nodesNotInSol, double alpha) {
 	int auxWeightControl = 0;
-	
 	unsigned int groupId;
 	std::sort(groupList->begin(), groupList->end(), [](Group lhs, Group rhs)
 	{
@@ -339,6 +343,8 @@ void Heuristic::phase3(vector <Group> *groupList,vector <Node> *nodesNotInSol, d
 	});
 	bool control = false;
 	vector <Group> groupCandidates = *groupList;
+	if (nodesNotInSol->size() == 0)
+		control = true;
 	while (!control) {
 		double bestGain = 0.0;
 		unsigned int nodeId = rand() % nodesNotInSol->size();
@@ -362,13 +368,15 @@ void Heuristic::phase3(vector <Group> *groupList,vector <Node> *nodesNotInSol, d
 					break;
 			nodesNotInSol->erase(nodesNotInSol->begin() + i);
 		}
+		*groupList = groupCandidates;
 		if (nodesNotInSol->size() == 0) {
 			control = true;
+			break;
 		}
 		//	solution->groupList = groupCandidates;
-		*groupList = groupCandidates;
 		//	cout << "Cost: " << solution->calculateCost() << endl;;
 	}
+
 
 }
 
@@ -745,16 +753,14 @@ int Heuristic::fixSolution()
 }
 
 void Heuristic::runSolver(){
-	/*for (int i = 0; i < 10000; i++) {
-		solution = new Solution();
-		//construtivo();
-		greedyRandomized(0.5);
-		shake();
-		//cout  << i << endl;
-		pSolver->addSolution(solution);
-	} */
-	pSolver->solveProblem();
-	//pSolver->newBuildProblem();
+	float max = pSolver->solutions[0]->cost;
+	for (auto s : pSolver->solutions ) {
+		if (max < s->cost)
+			max = s->cost;
+	} 
+	cout << "MAX COST:" << max << endl;
+	//pSolver->solveProblem();
+	pSolver->newBuildProblem();
 	vector <Group> groupList = pSolver->getClusters();
 	solution->groupList = groupList;
 	cout << "Solução : " << solution->calculateCost() << "Viabilidade " << solution->isFeasible(input->lowerB,input->upperB) <<  endl;
@@ -823,14 +829,14 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 		t = clock();
 		do {
 			cost = solution->cost;
-			//localSearch(alphas[ind][0]);
+			localSearch(alphas[ind][0]);
 			//cout << "Pos Bl " << solution->cost << endl;
-			//trade();
+			trade();
 			//cout << "Pos trade " << solution->cost << endl;
-			//trade2();
+			trade2();
 			//cout << "Pos trade2 " << solution->cost << endl;
 			//cout << "V: " << solution->isFeasible(input->lowerB, input->upperB) << endl;
-			//solution->printSolution();
+		solution->printSolution();
 		} while (cost < solution->cost); 
 			//solution->printSolution();
 			//cout << (clock() - t) / (double) CLOCKS_PER_SEC << endl;
@@ -883,13 +889,14 @@ void Heuristic::buildSolFromFile(vector<vector<int>> clusters)
 			G.cost = 0.0;
 			G.id = i;
 		for (int j = 0; j < clusters[i].size(); j++)  {
-			cout << clusters[i][j] << endl;
+			//cout << clusters[i][j] << endl;
 			G.insertNode(clusters[i][j]);
 		}
 		groupList.push_back(G);
 	}
 	Solution *n = new Solution();
 	n->groupList = groupList;
+	pSolver->addSolution(n);
 	cout << n->calculateCost() << endl;
 	cout << n->isFeasible(input->lowerB,input->upperB) << endl;
 }
@@ -944,6 +951,3 @@ int Heuristic::selectAlpha(double **alphas, int alphaRR, double rd)
 	}
 	return _return;
 }
-
-
-

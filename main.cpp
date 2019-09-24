@@ -13,22 +13,46 @@ using namespace std;
 
 int main(int arc, char **argv)
 {
-  srand(13);
+	srand(13);
    string instanceList = "../CCP/Instancias/instanceList.txt";
    string outputPath = "../CPP/output.txt";
-   string path = "C:/Users/HAL/Documents/GitHub/TCCExatas/Sol.txt";
+   string path = "C:/Users/vinic/Documents/GitHub/CCP/Files/RespostasSparse82/Sparse82_01.txt";
+   string path2 = "C:/Users/vinic/Documents/GitHub/CCP/Files/RespostasSparse82/resposta.txt";
    Input input;
    input.readInstance(argv[1], 1);
- //input.readSolution(path);
+   vector <vector <vector<int>>> clustersList;
    Heuristic h(&input);
-  //h.greedyRandomized2(0.1);
-		
-   h.greedyRandomizedReactive(10, 1, 1000, 13);
-   h.runSolver();
+   input.readFile2(path, &clustersList);
+	 for (int i = 0; i < 5000; i++) {
+	   h.buildSolFromFile(clustersList[i]);
+   }
+	 h.runSolver();
+  // h.greedyRandomizedReactive(10, 1, 130, 13);
+   
+ /*  for (int i = 0; i < 5000; i++) {
+	   vector <vector<int>> clusters1;
+	   input.readSolution(path, &clusters1);
+	   h.buildSolFromFile(clusters1);
+	//   h.construtivo();
+	 //  cout << i << endl;
+	
+   } */
+  // h.runSolver();
+  /* input.readSolution(path2, &clusters2);
+   input.readSolution(path3, &clusters3); 
+   input.readSolution(path7, &clusters4);*/
+
+  
+//	h.buildSolFromFile(clusters2);
+  // h.buildSolFromFile(clusters3); 
+   //h.buildSolFromFile(clusters4);
+  // h.runSolver();  
+  // Heuristic h(&input);
+  // h.greedyRandomizedReactive(10, 1, 130, 13);
+
    cout << "--------------" << endl; 
 
     return 0;
 }
-
 
 

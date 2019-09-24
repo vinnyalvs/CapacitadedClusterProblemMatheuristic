@@ -148,7 +148,7 @@ void ProblemSolver::newBuildProblem() {
 		model.set(GRB_StringAttr_ModelName, "CCP");
 		open = model.addVars(numAllClusters, GRB_BINARY);
 		//open = model.addVars(numAllClusters, GRB_INTEGER);
-		vector <int> costs;
+		vector <double> costs;
 		for (int i = 0; i < solutions.size(); i++) {
 			vector <Group> clusters = solutions[i]->groupList;
 			for (int j = 0; j < numClusters; j++) {
@@ -177,17 +177,18 @@ void ProblemSolver::newBuildProblem() {
 			ostringstream cname;
 			cname << "Objeto" << i;
 			for (int s = 0; s < solutions.size(); s++) {
-				expr += open[solutions[s]->getGroup(i) + 12*s] ;
+				expr += open[solutions[s]->getGroup(i) + 8*s] ;
 			}
 			model.addConstr(expr == 1, cname.str());
 		}
-
+		cout << "Tempo: ";
+		cout << (clock() - t) / (double)CLOCKS_PER_SEC << endl;
 		model.write("file.lp");
 		model.write("model.mps");
 		model.update();
-		model.set(GRB_IntAttr_ModelSense, GRB_MINIMIZE);
+		model.set(GRB_IntAttr_ModelSense, GRB_MAXIMIZE );
 		model.optimize();
-		cout << (clock() - t) / (double) CLOCKS_PER_SEC << endl;
+		
 	}
 	catch (GRBException e) {
 		cout << "Error code = " << e.getErrorCode() << endl;

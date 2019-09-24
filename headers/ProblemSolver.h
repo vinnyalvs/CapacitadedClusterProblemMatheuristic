@@ -10,7 +10,7 @@ class ProblemSolver
 private:
 	int solver;
 	Environment *env;
-	vector <Solution*> solutions;
+	
 	Solution *bestSolution;
 	int bestSolutionId;
 	Param p;
@@ -19,6 +19,7 @@ private:
 	vector <Group> clusters;
 
 public:
+	vector <Solution*> solutions;
 	ProblemSolver(int solver, int numObjs, int numClusters);
 	~ProblemSolver();
 	void setEnvironment(Environment *env);

@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream> 
+#include <set>
 class Input {
 
 public:
@@ -19,9 +20,10 @@ public:
     double lowerB;
     double upperB;
     Graph *g;
-	vector <vector<int>> clusters;
+	void readFile(string path, vector <vector<int>> *clusters);
+	void readFile2(string path, vector <vector <vector<int>>> *clustersList);
     void readInstance(string path, int type);
-	void readSolution(string path);
+	void readSolution(string path, vector <vector<int>> *clusters);
 private:
     void readType1(string path);
     void readType2(string path);
