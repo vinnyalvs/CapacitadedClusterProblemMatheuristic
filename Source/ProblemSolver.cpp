@@ -94,7 +94,7 @@ void ProblemSolver::buildProblem() {
 		indCnstNumClusters = newModel->getNumConstraints() - 1;
 	}
 	for (int j = 0; j < numObjs; j++) {
-		newModel->addConstraint(1, "=", "ConstrObject" + std::to_string(j), 1);
+		newModel->addConstraint(1, "<=", "ConstrObject" + std::to_string(j), 1);
 	}
 	//system("clear");
 	int countCluster = 0;
@@ -168,7 +168,7 @@ void ProblemSolver::newBuildProblem() {
 
 		ostringstream vname;
 		vname << "NumClusterFixed";
-		model.addConstr(exprFixed == numClusters, vname.str());
+		model.addConstr(exprFixed <= numClusters, vname.str());
 		cout << "fim " << endl;
 
 		IloExpr fixedNumClusters = 0;
@@ -188,7 +188,29 @@ void ProblemSolver::newBuildProblem() {
 		model.update();
 		model.set(GRB_IntAttr_ModelSense, GRB_MAXIMIZE );
 		model.optimize();
-		
+
+		GRBVar *vars = model.getVars();
+		vector <int> values;
+		for (int i = 0; i < model.get(GRB_IntAttr_NumVars); i++) {
+			if (vars[i].get(GRB_DoubleAttr_X) != 0) {
+				values.push_back(i);
+			}
+		}
+		int solution,clusterSol;
+		for (int c = 0; c<values.size(); c++) {
+			solution = floor(values[c] / numClusters);
+			clusterSol = values[c] - ((solution)*numClusters);
+			vector <Group> groups = solutions[solution]->groupList;
+			clusters.push_back(groups[clusterSol]);
+
+		}
+		Solution *s = new Solution();
+		s->groupList = clusters;
+		for (auto g : s->groupList)
+			g.calcWeights();
+		cout << s->isFeasible(75,125) << endl;;
+		cout << s->calculateCost() << endl;
+		s->printSolution();
 	}
 	catch (GRBException e) {
 		cout << "Error code = " << e.getErrorCode() << endl;

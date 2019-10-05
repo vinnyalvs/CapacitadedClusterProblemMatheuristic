@@ -259,7 +259,7 @@ void Input::readFile2(string path, vector <vector <vector<int>>> *clustersList) 
 	string line;
  
 	int numSol = 10;
-	
+	int count = 0;
 		int countLine = 4;
 		while (getline(inFile, line)) {
 		vector<vector<int>> grupos;
@@ -267,7 +267,10 @@ void Input::readFile2(string path, vector <vector <vector<int>>> *clustersList) 
 			//	std::cout << "asidjkas" << line << "n";
 			}
 			else if (countLine % 3 == 2) {
+				count++;
 				cout << countLine;
+				if (countLine > 100)
+					break;
 			//	std::cout << line << "n";
 				char *strAux2 = new char[line.length() + 1];
 				strcpy(strAux2, line.c_str());

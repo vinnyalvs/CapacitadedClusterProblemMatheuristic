@@ -16,18 +16,25 @@ int main(int arc, char **argv)
 	srand(13);
    string instanceList = "../CCP/Instancias/instanceList.txt";
    string outputPath = "../CPP/output.txt";
+   string instance = "C:/Users/vinic/Documents/GitHub/CCP/Files/instancia.txt";
    string path = "C:/Users/vinic/Documents/GitHub/CCP/Files/RespostasSparse82/Sparse82_01.txt";
-   string path2 = "C:/Users/vinic/Documents/GitHub/CCP/Files/RespostasSparse82/resposta.txt";
+  // string path2 = "C:/Users/vinic/Documents/GitHub/CCP/Files/RespostasSparse82/resposta.txt";
+   string path2 = "C:/Users/vinic/Documents/GitHub/CCP/Files/RespostasRandReal240/RanReal240.txt";
    Input input;
-   input.readInstance(argv[1], 1);
+   input.readInstance(instance, 1);
    vector <vector <vector<int>>> clustersList;
    Heuristic h(&input);
-   input.readFile2(path, &clustersList);
-	 for (int i = 0; i < 5000; i++) {
-	   h.buildSolFromFile(clustersList[i]);
-   }
-	 h.runSolver();
-  // h.greedyRandomizedReactive(10, 1, 130, 13);
+   input.readFile2(path2, &clustersList);
+	 for (int i = 0; i < 30; i++) {
+	   h.buildSolFromFile(clustersList[i]);  
+   } 
+	/* for (int i = 0; i < 1000; i++) {
+		 h.greedyRandomizedReactive(10, 1, 1, 13);
+	 } */
+
+	h.runSolver();
+  // h.greedyRandomizedReactive(10, 1, 1, 13);
+
    
  /*  for (int i = 0; i < 5000; i++) {
 	   vector <vector<int>> clusters1;

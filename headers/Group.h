@@ -13,6 +13,7 @@ class Group {
 public:
     Group();
     Group(unsigned int id);
+	void calcWeights();
     ~Group(){};
     void insertNode(unsigned int id);
     void removeNode(unsigned int id);

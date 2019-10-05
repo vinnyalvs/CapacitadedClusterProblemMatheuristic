@@ -102,6 +102,12 @@ bool Solution::isFeasible(double lowerB,double upperB){
     }
     //Checa se ainda há algum nó disponpivel ( não pertence a nenhum grupo)
 
+	if (list.size() < Group::g->order) {
+		cout << "Nos na solucao menor que numero de nos do grafo" << endl;
+		return false;
+	}
+
+
     for(auto n: list ){
         if(getGroup(n) == -1){
             cout << "No sem grupo" << endl;
@@ -122,7 +128,7 @@ bool Solution::isFeasible(double lowerB,double upperB){
 		}
 		else {
 
-            cout << "nos repetidos" << endl;
+            cout << "nos repetidos " << i << endl;
             return false;
 		}
         i++;

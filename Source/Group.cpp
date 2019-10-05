@@ -17,6 +17,12 @@ Group::Group(unsigned int id)
     cost = 0.0;
 }
 
+void Group::calcWeights() {
+	weight = 0.0;
+	for (auto i : nodeList)
+		weight += g->nodes[i].weight;
+}
+
 void Group::insertNode(unsigned int index)
 {
     weight += g->nodes[index].weight;

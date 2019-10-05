@@ -85,7 +85,8 @@ void Heuristic::construtivo()
 		return lhs.id < rhs.id;
 	});
 	solution->groupList = groupList;
-	solution->calculateCost();
+	
+	cout << solution->calculateCost() << endl;
 	pSolver->addSolution(solution);
 	nodeInSol.clear();
 //	cout << solution->isFeasible(input->lowerB,input->upperB) << endl;
@@ -754,10 +755,15 @@ int Heuristic::fixSolution()
 
 void Heuristic::runSolver(){
 	float max = pSolver->solutions[0]->cost;
+	Solution *auxSol = pSolver->solutions[0];
 	for (auto s : pSolver->solutions ) {
-		if (max < s->cost)
+		if (max < s->cost) {
 			max = s->cost;
+			auxSol = s;
+		}
 	} 
+	auxSol->printSolution();
+	cout << auxSol->isFeasible(75, 125) << endl;;
 	cout << "MAX COST:" << max << endl;
 	//pSolver->solveProblem();
 	pSolver->newBuildProblem();
@@ -767,7 +773,7 @@ void Heuristic::runSolver(){
 	ofstream f;
     f.open("sols.txt",ios::app);
 	f << solution->cost << endl;
-	delete pSolver;
+//	delete pSolver;
 
 
 }
@@ -836,7 +842,7 @@ void Heuristic::greedyRandomizedReactive(int alphaRR, int betaRR, int numIterati
 			trade2();
 			//cout << "Pos trade2 " << solution->cost << endl;
 			//cout << "V: " << solution->isFeasible(input->lowerB, input->upperB) << endl;
-		solution->printSolution();
+	//	solution->printSolution();
 		} while (cost < solution->cost); 
 			//solution->printSolution();
 			//cout << (clock() - t) / (double) CLOCKS_PER_SEC << endl;
